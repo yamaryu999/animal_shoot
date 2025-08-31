@@ -120,13 +120,23 @@ export class StoryText {
     draw() {
         if (!this.isVisible || this.currentText.length === 0) return;
 
+        // キャンバスのサイズを動的に取得
+        const canvasWidth = this.ctx.canvas.width;
+        const canvasHeight = this.ctx.canvas.height;
+
+        // テキストボックスのサイズと位置をキャンバスサイズに合わせて調整
+        const boxWidth = Math.min(canvasWidth * 0.8, 300); // 最大300pxまたはキャンバス幅の80%
+        const boxHeight = 100; // 固定
+        const boxX = (canvasWidth - boxWidth) / 2; // 中央に配置
+        const boxY = canvasHeight - boxHeight - 20; // 画面下部に配置
+
         // テキストボックスの背景
         this.ctx.save();
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(50, 450, 300, 100);
+        this.ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
         this.ctx.strokeStyle = '#8B4513';
         this.ctx.lineWidth = 3;
-        this.ctx.strokeRect(50, 450, 300, 100);
+        this.ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
         // テキスト
         this.ctx.fillStyle = 'white';
@@ -136,8 +146,8 @@ export class StoryText {
         // 改良された複数行対応
         const words = this.currentText.split(' ');
         let line = '';
-        let y = 470;
-        const maxWidth = 260; // テキストボックス内の最大幅
+        let y = boxY + 20; // テキスト開始位置
+        const maxWidth = boxWidth - 40; // テキストボックス内の最大幅（左右20pxのパディング）
         const lineHeight = 18;
         const maxLines = 4; // 最大行数
         let currentLine = 0;
@@ -149,7 +159,7 @@ export class StoryText {
             if (testWidth > maxWidth && line !== '') {
                 // 現在の行を描画
                 if (currentLine < maxLines) {
-                    this.ctx.fillText(line.trim(), 70, y);
+                    this.ctx.fillText(line.trim(), boxX + 20, y);
                     y += lineHeight;
                     currentLine++;
                 }
@@ -162,7 +172,7 @@ export class StoryText {
             if (currentLine >= maxLines) {
                 if (line.length > 0) {
                     const truncatedLine = line.substring(0, 30) + '...';
-                    this.ctx.fillText(truncatedLine, 70, y - lineHeight);
+                    this.ctx.fillText(truncatedLine, boxX + 20, y - lineHeight);
                 }
                 break;
             }
@@ -170,13 +180,13 @@ export class StoryText {
         
         // 最後の行を描画
         if (currentLine < maxLines && line.trim().length > 0) {
-            this.ctx.fillText(line.trim(), 70, y);
+            this.ctx.fillText(line.trim(), boxX + 20, y);
         }
 
         // タイピングカーソル
         if (this.isTyping && currentLine < maxLines) {
             this.ctx.fillStyle = 'white';
-            const cursorX = 70 + this.ctx.measureText(line.trim()).width;
+            const cursorX = boxX + 20 + this.ctx.measureText(line.trim()).width;
             this.ctx.fillRect(cursorX, y - 15, 2, 15);
         }
 
