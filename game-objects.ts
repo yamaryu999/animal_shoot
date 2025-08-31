@@ -1,4 +1,4 @@
-import { Bounds, EnemyType } from './types';
+import { Bounds, EnemyType, PowerUpType, BulletType } from './types';
 
 // ゲームオブジェクトの基本クラス
 export abstract class GameObject {
@@ -49,6 +49,7 @@ export class Player extends GameObject {
     private invulnerableTime: number;
     private animationTime: number;
     private lastX: number;
+    private lastY: number; // Y座標の変更を追跡するためのプロパティ
     private velocityX: number;
     private isMoving: boolean;
     private direction: number; // -1: 左, 0: 停止, 1: 右
@@ -72,6 +73,8 @@ export class Player extends GameObject {
     private overallFlap: number; // オーバーオールの揺れ
     private isBlinking: boolean; // まばたき状態
     private blinkTime: number; // まばたき時間
+    private activePowerUp: PowerUpType | null; // 現在アクティブなパワーアップ
+    private powerUpTime: number; // パワーアップの残り時間
 
     constructor(x: number, y: number) {
         super(x, y, 40, 40, 5, '#000000');
@@ -80,6 +83,7 @@ export class Player extends GameObject {
         this.invulnerableTime = 0;
         this.animationTime = 0;
         this.lastX = x;
+        this.lastY = y; // 初期化
         this.velocityX = 0;
         this.isMoving = false;
         this.direction = 0;
@@ -103,6 +107,8 @@ export class Player extends GameObject {
         this.overallFlap = 0;
         this.isBlinking = false;
         this.blinkTime = 0;
+        this.activePowerUp = null;
+        this.powerUpTime = 0;
     }
 
     update(): void {
@@ -130,14 +136,22 @@ export class Player extends GameObject {
         }
 
         // 速度と移動状態の計算
-        this.velocityX = this.x - this.lastX;
-        this.isMoving = Math.abs(this.velocityX) > 0.1;
+        const previousX = this.lastX;
+        const previousY = this.lastY;
+        this.lastX = this.x;
+        this.lastY = this.y;
+
+        this.velocityX = this.x - previousX;
+        const velocityY = this.y - previousY; // 垂直方向の速度を追加
+        
+        // isMovingの判定に垂直方向の移動も含める
+        this.isMoving = Math.abs(this.velocityX) > 0.1 || Math.abs(velocityY) > 0.1;
 
         if (this.velocityX > 0.1) {
             this.direction = 1;
         } else if (this.velocityX < -0.1) {
             this.direction = -1;
-        } else if (Math.abs(this.velocityX) <= 0.1) {
+        } else if (Math.abs(this.velocityX) <= 0.1 && Math.abs(velocityY) <= 0.1) {
             this.direction = 0;
         }
 
@@ -158,6 +172,15 @@ export class Player extends GameObject {
             if (this.attackTime > 0.3) {
                 this.attackMode = false;
                 this.attackTime = 0;
+            }
+        }
+
+        // パワーアップ時間の処理
+        if (this.activePowerUp) {
+            this.powerUpTime -= 0.016;
+            if (this.powerUpTime <= 0) {
+                this.activePowerUp = null;
+                console.log("Power-up expired!");
             }
         }
 
@@ -187,7 +210,6 @@ export class Player extends GameObject {
         this.footStep = Math.sin(this.animationTime * 10) * 0.1; // 足音エフェクト
         this.overallFlap = this.isMoving ? Math.sin(this.animationTime * 12) * 0.05 : 0; // オーバーオールの揺れ
 
-        this.lastX = this.x;
     }
 
     // 表情の動的更新
@@ -220,6 +242,20 @@ export class Player extends GameObject {
     attack(): void {
         this.attackMode = true;
         this.attackTime = 0;
+    }
+
+    // パワーアップに応じた弾のタイプを返すヘルパーメソッド
+    getCurrentBulletType(): BulletType {
+        switch (this.activePowerUp) {
+            case 'wrench':
+                return 'piercing'; // レンチは貫通弾
+            case 'oil_can':
+                return 'flame';    // オイル缶は火炎弾
+            case 'hammer':
+                return 'wide';     // ハンマーは広範囲弾
+            default:
+                return 'normal';   // デフォルトは通常の弾
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -494,6 +530,36 @@ export class Player extends GameObject {
         ctx.arc(centerX + 10 + this.toolBeltSwing, centerY + 8, 2, 0, Math.PI * 2);
         ctx.fill();
         
+        // パワーアップに応じた描画
+        if (this.activePowerUp === 'glasses') {
+            // メガネの描画
+            ctx.save();
+            ctx.translate(centerX, centerY - 12 + this.headBob); // 頭の位置に合わせる
+            ctx.rotate(tiltAngle * 0.5); // 頭の傾きに合わせる
+            ctx.strokeStyle = mechanicColors.outline;
+            ctx.lineWidth = 1.5;
+            ctx.fillStyle = 'rgba(173, 216, 230, 0.4)'; // ライトブルーで半透明
+
+            // 左レンズ
+            ctx.beginPath();
+            ctx.arc(-7, 0, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 右レンズ
+            ctx.beginPath();
+            ctx.arc(7, 0, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // ブリッジ
+            ctx.beginPath();
+            ctx.moveTo(-5, 0);
+            ctx.lineTo(5, 0);
+            ctx.stroke();
+            ctx.restore();
+        }
+
         // 1930年代風の控えめなエフェクト
         if (this.isMoving) {
             // 手描き風の動き線
@@ -540,6 +606,13 @@ export class Player extends GameObject {
         }
     }
 
+    activatePowerUp(type: PowerUpType): void {
+        this.activePowerUp = type;
+        this.powerUpTime = 5; // 5秒間パワーアップ
+        console.log(`Power-up activated: ${type}`);
+        // 必要に応じて、パワーアップの種類に応じた追加のロジックをここに追加
+    }
+
     getLives(): number {
         return this.lives;
     }
@@ -547,32 +620,67 @@ export class Player extends GameObject {
     isAlive(): boolean {
         return this.lives > 0;
     }
+
+    getActivePowerUp(): PowerUpType | null {
+        return this.activePowerUp;
+    }
 }
 
 // 弾クラス
 export class Bullet extends GameObject {
     private animationTime: number;
+    private type: BulletType; // 弾の種類を追加
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, type: BulletType = 'normal') {
         super(x, y, 4, 10, 8, '#F1C40F');
         this.animationTime = 0;
+        this.type = type;
+
+        // 弾の種類に応じてサイズや色を変更
+        switch (this.type) {
+            case 'piercing':
+                this.color = '#808080'; // 貫通弾はグレー
+                this.width = 6;
+                this.height = 15;
+                break;
+            case 'flame':
+                this.color = '#FF4500'; // 火炎弾はオレンジレッド
+                this.width = 8;
+                this.height = 12;
+                this.speed = 6; // 少し遅め
+                break;
+            case 'wide':
+                this.color = '#FFFF00'; // 広範囲弾は黄色
+                this.width = 10;
+                this.height = 8;
+                this.speed = 7;
+                break;
+            case 'normal':
+            default:
+                // デフォルトはコンストラクタで設定済み
+                break;
+        }
     }
 
     update(): void {
         this.y -= this.speed;
-        this.animationTime += 0.016; // アニメーション時間の更新
+        this.animationTime += 0.016;
+
+        // 火炎弾の特殊な動きやエフェクト
+        if (this.type === 'flame') {
+            this.x += Math.sin(this.animationTime * 15) * 0.5; // ゆらゆらと動く
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.save();
         
-        // 1930年代風のシンプルな弾
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         
         // 1930年代風カラーパレット
         const bulletColors = {
-            main: '#F4A460',      // セピア調オレンジ
+            main: this.color, // 弾の色を動的に
             outline: '#8B4513',   // 茶色のアウトライン
             glow: '#DEB887'       // ベージュのグロー
         };
@@ -587,10 +695,45 @@ export class Bullet extends GameObject {
         ctx.fillStyle = bulletColors.main;
         ctx.strokeStyle = bulletColors.outline;
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, this.width / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+
+        switch (this.type) {
+            case 'piercing':
+                // 貫通弾は菱形
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY - this.height / 2);
+                ctx.lineTo(centerX + this.width / 2, centerY);
+                ctx.lineTo(centerX, centerY + this.height / 2);
+                ctx.lineTo(centerX - this.width / 2, centerY);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'flame':
+                // 火炎弾は炎の形
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY - this.height / 2);
+                ctx.quadraticCurveTo(centerX + this.width / 2, centerY - this.height / 4, centerX + this.width / 2, centerY);
+                ctx.quadraticCurveTo(centerX + this.width / 4, centerY + this.height / 2, centerX, centerY + this.height / 2);
+                ctx.quadraticCurveTo(centerX - this.width / 4, centerY + this.height / 2, centerX - this.width / 2, centerY);
+                ctx.quadraticCurveTo(centerX - this.width / 2, centerY - this.height / 4, centerX, centerY - this.height / 2);
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'wide':
+                // 広範囲弾は横長の楕円
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'normal':
+            default:
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                break;
+        }
         
         // 内側のハイライト
         ctx.fillStyle = '#FFFFFF';
@@ -613,6 +756,10 @@ export class Bullet extends GameObject {
 
     isOffScreen(): boolean {
         return this.y + this.height < 0;
+    }
+
+    getType(): BulletType {
+        return this.type;
     }
 }
 
@@ -1068,6 +1215,107 @@ export class Particle {
         ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
+    }
+}
+
+// パワーアップクラス
+export class PowerUp extends GameObject {
+    private type: PowerUpType;
+    private animationTime: number;
+
+    constructor(x: number, y: number, type: PowerUpType) {
+        // 1930年代風のセピア調カラーパレット
+        const colors = {
+            'wrench': '#A9A9A9',   // ダークグレー
+            'oil_can': '#8B4513',  // 茶色
+            'hammer': '#696969',   // グレー
+            'glasses': '#ADD8E6'   // ライトブルー
+        };
+        super(x, y, 20, 20, 0, colors[type] || '#A9A9A9'); // パワーアップは動かない
+        this.type = type;
+        this.animationTime = 0;
+    }
+
+    update(): void {
+        this.animationTime += 0.05;
+        this.y += Math.sin(this.animationTime * 2) * 0.5; // 上下ふわふわ
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        ctx.save();
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
+
+        // アイテムのアウトライン
+        ctx.strokeStyle = '#2F2F2F';
+        ctx.lineWidth = 2;
+
+        // アイテムの色
+        ctx.fillStyle = this.color;
+
+        switch (this.type) {
+            case 'wrench':
+                // レンチ
+                ctx.beginPath();
+                ctx.rect(centerX - 8, centerY - 10, 16, 20);
+                ctx.stroke();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(centerX, centerY - 10, 5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(centerX - 5, centerY + 5, 10, 10);
+                ctx.stroke();
+                ctx.fill();
+                break;
+            case 'oil_can':
+                // オイル缶
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, 10, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.rect(centerX - 3, centerY - 12, 6, 8);
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'hammer':
+                // ハンマー
+                ctx.beginPath();
+                ctx.rect(centerX - 2, centerY - 10, 4, 20);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.rect(centerX - 8, centerY - 12, 16, 5);
+                ctx.fill();
+                ctx.stroke();
+                break;
+            case 'glasses':
+                // メガネ
+                ctx.beginPath();
+                ctx.arc(centerX - 5, centerY, 6, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(centerX + 5, centerY, 6, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(centerX - 5, centerY);
+                ctx.lineTo(centerX + 5, centerY);
+                ctx.stroke();
+                break;
+        }
+        ctx.restore();
+    }
+
+    getType(): PowerUpType {
+        return this.type;
+    }
+
+    isOffScreen(): boolean {
+        return this.y > 600;
     }
 }
 

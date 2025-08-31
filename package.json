@@ -1,0 +1,31 @@
+{
+  "name": "shuttiing",
+  "version": "1.0.0",
+  "description": "1930年代のレトロアニメ風の縦型スクロールシューティングゲームです！セルアニメーションの黄金期を再現したクラシックなアートスタイルで、まるでアニメの世界にいるかのような体験をお楽しみください！",
+  "main": "game-objects.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yamaryu999/animal_shoot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yamaryu999/animal_shoot/issues"
+  },
+  "homepage": "https://github.com/yamaryu999/animal_shoot#readme",
+  "devDependencies": {
+    "gsap": "^3.13.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}

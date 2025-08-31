@@ -33,6 +33,12 @@ export interface TouchPosition {
 // 敵の種類
 export type EnemyType = 'dog' | 'bird' | 'rabbit' | 'pig';
 
+// パワーアップの種類
+export type PowerUpType = 'wrench' | 'oil_can' | 'hammer' | 'glasses';
+
+// 弾の種類
+export type BulletType = 'normal' | 'piercing' | 'flame' | 'wide';
+
 // ステージ情報
 export interface StageInfo {
     name: string;

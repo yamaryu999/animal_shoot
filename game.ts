@@ -1,7 +1,7 @@
-import { GameConfig, EnemyType } from './types';
+import { GameConfig, EnemyType, PowerUpType, BulletType } from './types';
 import { TextDisplay, StoryText } from './text-system';
 import { StoryMode } from './story-mode';
-import { Player, Bullet, Enemy, Particle } from './game-objects';
+import { Player, Bullet, Enemy, Particle, PowerUp } from './game-objects';
 import { InputHandler } from './input-handler';
 import { Renderer } from './renderer';
 
@@ -18,6 +18,7 @@ export class AnimalShootingGame {
     private bullets: Bullet[] = [];
     private enemies: Enemy[] = [];
     private particles: Particle[] = [];
+    private powerUps: PowerUp[] = []; // パワーアップアイテムの配列を追加
     
     private score: number = 0;
     private gameOver: boolean = false;
@@ -328,12 +329,24 @@ export class AnimalShootingGame {
     private shoot(): void {
         const now = performance.now();
         if (now - this.lastShot > this.shotCooldown * 16) {
-            const bullet = new Bullet(
-                this.player.getBounds().x + this.player.getBounds().width / 2 - 2,
-                this.player.getBounds().y
-            );
-            this.bullets.push(bullet);
+            const bulletType = this.player.getCurrentBulletType();
+
+            // 広範囲弾の場合は3方向に発射
+            if (bulletType === 'wide') {
+                const bullet1 = new Bullet(this.player.getBounds().x + this.player.getBounds().width / 2 - 2, this.player.getBounds().y, bulletType);
+                const bullet2 = new Bullet(this.player.getBounds().x + this.player.getBounds().width / 2 - 10, this.player.getBounds().y + 5, bulletType);
+                const bullet3 = new Bullet(this.player.getBounds().x + this.player.getBounds().width / 2 + 6, this.player.getBounds().y + 5, bulletType);
+                this.bullets.push(bullet1, bullet2, bullet3);
+            } else {
+                const bullet = new Bullet(
+                    this.player.getBounds().x + this.player.getBounds().width / 2 - 2,
+                    this.player.getBounds().y,
+                    bulletType
+                );
+                this.bullets.push(bullet);
+            }
             this.lastShot = now;
+            this.player.attack(); // プレイヤーの攻撃アニメーションをトリガー
         }
     }
 
@@ -377,6 +390,15 @@ export class AnimalShootingGame {
         }
     }
 
+    private spawnPowerUp(x: number, y: number): void {
+        if (Math.random() < 0.2) { // 20%の確率でパワーアップを生成
+            const powerUpTypes: PowerUpType[] = ['wrench', 'oil_can', 'hammer', 'glasses'];
+            const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+            const powerUp = new PowerUp(x, y, type);
+            this.powerUps.push(powerUp);
+        }
+    }
+
     private updateGameObjects(): void {
         // プレイヤーの更新
         this.player.update();
@@ -398,6 +420,12 @@ export class AnimalShootingGame {
             return particle.update();
         });
         
+        // パワーアップの更新
+        this.powerUps = this.powerUps.filter(powerUp => {
+            powerUp.update();
+            return !powerUp.isOffScreen();
+        });
+
         // テキスト表示の更新
         this.textDisplay.update();
         this.storyText.update();
@@ -424,6 +452,9 @@ export class AnimalShootingGame {
                     this.enemies.splice(j, 1);
                     this.score += 100;
                     this.enemiesDefeated++;
+
+                    // 敵を倒したときにパワーアップを生成する可能性
+                    this.spawnPowerUp(enemyBounds.x, enemyBounds.y);
                     
                     // 敵を倒した時のメッセージ
                     this.textDisplay.addMessage("+100点！", 
@@ -433,6 +464,11 @@ export class AnimalShootingGame {
                     
                     // ステージ進行チェック
                     this.checkStageProgress();
+
+                    // 貫通弾でなければ弾を削除
+                    if (this.bullets[i].getType() !== 'piercing') {
+                        this.bullets.splice(i, 1);
+                    }
                     break;
                 }
             }
@@ -461,6 +497,14 @@ export class AnimalShootingGame {
                 break;
             }
         }
+
+        // プレイヤーとパワーアップアイテムの衝突判定
+        for (let i = this.powerUps.length - 1; i >= 0; i--) {
+            if (this.player.collidesWith(this.powerUps[i])) {
+                this.player.activatePowerUp(this.powerUps[i].getType());
+                this.powerUps.splice(i, 1); // 取得したパワーアップを削除
+            }
+        }
     }
 
     private draw(): void {
@@ -475,6 +519,7 @@ export class AnimalShootingGame {
         this.bullets.forEach(bullet => bullet.draw(this.ctx));
         this.enemies.forEach(enemy => enemy.draw(this.ctx));
         this.particles.forEach(particle => particle.draw(this.ctx));
+        this.powerUps.forEach(powerUp => powerUp.draw(this.ctx)); // パワーアップアイテムの描画
         
         // テキスト表示の描画
         this.textDisplay.draw();
