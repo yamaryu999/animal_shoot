@@ -481,7 +481,9 @@ export class Bullet extends GameObject {
         ctx.fill();
         // 1930年代風の控えめなパルス効果
         const pulse = Math.sin(this.animationTime * 20) * 0.3 + 0.7;
-        ctx.strokeStyle = `${bulletColors.outline}${Math.floor(pulse * 255).toString(16).padStart(2, '0')}`;
+        const alpha = Math.floor(pulse * 255).toString(16);
+        const alphaHex = alpha.length === 1 ? '0' + alpha : alpha;
+        ctx.strokeStyle = `${bulletColors.outline}${alphaHex}`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(centerX, centerY, this.width / 2 + 2, 0, Math.PI * 2);

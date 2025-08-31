@@ -39,7 +39,7 @@ export class AnimalShootingGame {
             enemySpawnRate: 60,
             minEnemySpawnRate: 20
         };
-        this.player = new Player(180, 520);
+        this.player = new Player(180, 520, this.canvas);
         // システムの初期化
         this.textDisplay = new TextDisplay(this.ctx);
         this.storyText = new StoryText(this.ctx);
@@ -51,13 +51,6 @@ export class AnimalShootingGame {
         this.gameLoop();
         // GSAPアニメーション初期化
         this.initGSAPAnimations();
-    }
-    setupStorySkipHandler() {
-        this.inputHandler.setupStorySkipHandler(() => {
-            if (this.storyPaused) {
-                this.skipStoryText();
-            }
-        });
         
         // キーボードでもストーリーをスキップできるようにする
         document.addEventListener('keydown', (e) => {
@@ -70,6 +63,13 @@ export class AnimalShootingGame {
                 this.storyPaused = false;
                 this.storyText.hide();
                 this.textDisplay.addMessage("ゲーム開始！", 200, 100, 2000, 20, '#27AE60');
+            }
+        });
+    }
+    setupStorySkipHandler() {
+        this.inputHandler.setupStorySkipHandler(() => {
+            if (this.storyPaused) {
+                this.skipStoryText();
             }
         });
     }
@@ -380,7 +380,6 @@ export class AnimalShootingGame {
         const currentTime = performance.now();
         const deltaTime = currentTime - this.lastFrameTime;
         this.lastFrameTime = currentTime;
-        
         if (!this.gameOver) {
             if (!this.storyPaused) {
                 this.handleInput();
@@ -406,7 +405,7 @@ export class AnimalShootingGame {
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
         }
-        this.player = new Player(180, 520);
+        this.player = new Player(180, 520, this.canvas);
         this.bullets = [];
         this.enemies = [];
         this.particles = [];

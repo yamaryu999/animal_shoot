@@ -9,15 +9,14 @@ export class InputHandler {
         this.autoShoot = false;
         this.shootButtonPressed = false;
         this.canvas = canvas;
-        
         this.detectMobile();
         this.setupEventListeners();
         this.setupTouchControls();
     }
     detectMobile() {
-        // より厳密なモバイル検出（PCでもタッチ機能がある場合を考慮）
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-            (window.innerWidth <= 768 && 'ontouchstart' in window);
+            ('ontouchstart' in window) ||
+            (window.innerWidth <= 768);
     }
     setupEventListeners() {
         document.addEventListener('keydown', (e) => {
@@ -114,8 +113,8 @@ export class InputHandler {
         feedback.style.top = (clientY - 20) + 'px';
         document.body.appendChild(feedback);
         // GSAPアニメーション
-        if (typeof gsap !== 'undefined') {
-            gsap.fromTo(feedback, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.3, ease: "power2.out" });
+        if (typeof window.gsap !== 'undefined') {
+            window.gsap.fromTo(feedback, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.3, ease: "power2.out" });
         }
         // アニメーション終了後に確実に削除
         const removeFeedback = () => {

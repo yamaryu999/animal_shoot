@@ -93,30 +93,23 @@ export class StoryText {
     draw() {
         if (!this.isVisible || this.currentText.length === 0)
             return;
-        // テキストボックスの背景（1930年代風デザイン）
+        // テキストボックスの背景
         this.ctx.save();
-        this.ctx.fillStyle = 'rgba(139, 69, 19, 0.9)'; // セピア調の背景
-        this.ctx.fillRect(20, 480, 360, 100);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillRect(50, 450, 300, 100);
         this.ctx.strokeStyle = '#8B4513';
-        this.ctx.lineWidth = 4;
-        this.ctx.strokeRect(20, 480, 360, 100);
-        
-        // 1930年代風の装飾枠
-        this.ctx.strokeStyle = '#DEB887';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(25, 485, 350, 90);
-        
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(50, 450, 300, 100);
         // テキスト
-        this.ctx.fillStyle = '#F5F5DC'; // ベージュのテキスト
-        this.ctx.font = 'bold 16px "Playfair Display", serif';
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '14px Comic Sans MS';
         this.ctx.textAlign = 'left';
-        
         // 改良された複数行対応
         const words = this.currentText.split(' ');
         let line = '';
-        let y = 500;
-        const maxWidth = 330; // テキストボックス内の最大幅をさらに拡大
-        const lineHeight = 22;
+        let y = 470;
+        const maxWidth = 260; // テキストボックス内の最大幅
+        const lineHeight = 18;
         const maxLines = 4; // 最大行数
         let currentLine = 0;
         for (let word of words) {
@@ -125,7 +118,7 @@ export class StoryText {
             if (testWidth > maxWidth && line !== '') {
                 // 現在の行を描画
                 if (currentLine < maxLines) {
-                    this.ctx.fillText(line.trim(), 40, y);
+                    this.ctx.fillText(line.trim(), 70, y);
                     y += lineHeight;
                     currentLine++;
                 }
@@ -137,21 +130,21 @@ export class StoryText {
             // 最大行数に達した場合は省略記号を追加
             if (currentLine >= maxLines) {
                 if (line.length > 0) {
-                    const truncatedLine = line.substring(0, 35) + '...';
-                    this.ctx.fillText(truncatedLine, 40, y - lineHeight);
+                    const truncatedLine = line.substring(0, 30) + '...';
+                    this.ctx.fillText(truncatedLine, 70, y - lineHeight);
                 }
                 break;
             }
         }
         // 最後の行を描画
         if (currentLine < maxLines && line.trim().length > 0) {
-            this.ctx.fillText(line.trim(), 40, y);
+            this.ctx.fillText(line.trim(), 70, y);
         }
-        // タイピングカーソル（1930年代風）
+        // タイピングカーソル
         if (this.isTyping && currentLine < maxLines) {
-            this.ctx.fillStyle = '#F4A460'; // セピア調のカーソル
-            const cursorX = 40 + this.ctx.measureText(line.trim()).width;
-            this.ctx.fillRect(cursorX, y - 18, 3, 18);
+            this.ctx.fillStyle = 'white';
+            const cursorX = 70 + this.ctx.measureText(line.trim()).width;
+            this.ctx.fillRect(cursorX, y - 15, 2, 15);
         }
         this.ctx.restore();
     }
