@@ -524,6 +524,14 @@ export class Player extends GameObject {
         this.x = Math.min(400 - this.width, this.x + this.speed);
     }
 
+    moveUp(): void {
+        this.y = Math.max(0, this.y - this.speed);
+    }
+
+    moveDown(): void {
+        this.y = Math.min(600 - this.height, this.y + this.speed);
+    }
+
     takeDamage(): void {
         if (!this.invulnerable) {
             this.lives--;

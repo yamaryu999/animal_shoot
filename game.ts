@@ -212,14 +212,44 @@ export class AnimalShootingGame {
     }
 
     private handleInput(): void {
-        // キーボード入力
-        if (this.inputHandler.isKeyPressed('ArrowLeft')) {
+        // キーボード入力 - 上下左右移動（斜め移動対応）
+        let moveX = 0;
+        let moveY = 0;
+
+        if (this.inputHandler.isKeyPressed('ArrowLeft') || this.inputHandler.isKeyPressed('KeyA')) {
+            moveX -= 1;
+        }
+        if (this.inputHandler.isKeyPressed('ArrowRight') || this.inputHandler.isKeyPressed('KeyD')) {
+            moveX += 1;
+        }
+        if (this.inputHandler.isKeyPressed('ArrowUp') || this.inputHandler.isKeyPressed('KeyW')) {
+            moveY -= 1;
+        }
+        if (this.inputHandler.isKeyPressed('ArrowDown') || this.inputHandler.isKeyPressed('KeyS')) {
+            moveY += 1;
+        }
+
+        // 斜め移動の場合は速度を調整（対角線の長さを1にする）
+        if (moveX !== 0 && moveY !== 0) {
+            moveX *= 0.707; // 1/√2
+            moveY *= 0.707;
+        }
+
+        // 移動を適用
+        if (moveX < 0) {
             this.player.moveLeft();
         }
-        if (this.inputHandler.isKeyPressed('ArrowRight')) {
+        if (moveX > 0) {
             this.player.moveRight();
         }
-        if (this.inputHandler.isKeyPressed('Space')) {
+        if (moveY < 0) {
+            this.player.moveUp();
+        }
+        if (moveY > 0) {
+            this.player.moveDown();
+        }
+
+        if (this.inputHandler.isKeyPressed('Space') || this.inputHandler.isKeyPressed('KeyX')) {
             this.shoot();
         }
 
@@ -245,18 +275,53 @@ export class AnimalShootingGame {
 
         const playerBounds = this.player.getBounds();
         const playerCenterX = playerBounds.x + playerBounds.width / 2;
+        const playerCenterY = playerBounds.y + playerBounds.height / 2;
         const touchX = touchPosition.x;
+        const touchY = touchPosition.y;
 
         // タッチ位置とプレイヤーの距離を計算
-        const distance = Math.abs(touchX - playerCenterX);
+        const distanceX = Math.abs(touchX - playerCenterX);
+        const distanceY = Math.abs(touchY - playerCenterY);
         const threshold = 10; // 移動を停止する距離の閾値
 
-        if (distance > threshold) {
+        // 上下左右移動（斜め移動対応）
+        let moveX = 0;
+        let moveY = 0;
+
+        if (distanceX > threshold) {
             if (touchX < playerCenterX) {
-                this.player.moveLeft();
+                moveX = -1;
             } else if (touchX > playerCenterX) {
-                this.player.moveRight();
+                moveX = 1;
             }
+        }
+
+        if (distanceY > threshold) {
+            if (touchY < playerCenterY) {
+                moveY = -1;
+            } else if (touchY > playerCenterY) {
+                moveY = 1;
+            }
+        }
+
+        // 斜め移動の場合は速度を調整（対角線の長さを1にする）
+        if (moveX !== 0 && moveY !== 0) {
+            moveX *= 0.707; // 1/√2
+            moveY *= 0.707;
+        }
+
+        // 移動を適用
+        if (moveX < 0) {
+            this.player.moveLeft();
+        }
+        if (moveX > 0) {
+            this.player.moveRight();
+        }
+        if (moveY < 0) {
+            this.player.moveUp();
+        }
+        if (moveY > 0) {
+            this.player.moveDown();
         }
     }
 
