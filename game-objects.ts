@@ -71,7 +71,7 @@ export class Player extends GameObject {
             return;
         }
 
-        // レトロアニメ風のサイバーネコキャラクター
+        // 超派手なサイバーネコキャラクター
         ctx.save();
         
         // アニメーション用の軽い揺れ
@@ -79,125 +79,195 @@ export class Player extends GameObject {
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2 + bounce;
         
-        // サイバー影（ネオン効果）
-        ctx.fillStyle = 'rgba(0, 255, 65, 0.3)';
+        // 超派手なサイバー影（虹色効果）
+        const shadowColors = ['#ff006e', '#00ff41', '#8338ec', '#ffbe0b', '#fb5607'];
+        const shadowIndex = Math.floor(performance.now() * 0.01) % shadowColors.length;
+        ctx.fillStyle = `${shadowColors[shadowIndex]}40`;
         ctx.beginPath();
         ctx.ellipse(centerX, this.y + this.height + 2, this.width / 2.5, 4, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // 体（サイバーパンク風の装甲）
-        ctx.fillStyle = '#1a1a2e';
+        // 体（超派手なサイバーパンク風の装甲）
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, this.width / 2);
+        gradient.addColorStop(0, '#1a1a2e');
+        gradient.addColorStop(0.5, '#16213e');
+        gradient.addColorStop(1, '#0f3460');
+        ctx.fillStyle = gradient;
         ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.ellipse(centerX, centerY + 5, this.width / 2.5, this.height / 2.8, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // サイバー装甲の装飾
+        // 超派手なサイバー装甲の装飾（回転するリング）
+        const rotation = performance.now() * 0.005;
+        ctx.save();
+        ctx.translate(centerX, centerY + 5);
+        ctx.rotate(rotation);
         ctx.strokeStyle = '#06ffa5';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 5, this.width / 2.5 - 2, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.width / 2.5 - 2, 0, Math.PI * 2);
         ctx.stroke();
         
-        // 頭（サイバーヘルメット風）
-        ctx.fillStyle = '#000428';
+        // 内側の回転リング
+        ctx.rotate(-rotation * 2);
+        ctx.strokeStyle = '#ff006e';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.width / 2.5 - 6, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        
+        // 頭（超派手なサイバーヘルメット風）
+        const headGradient = ctx.createRadialGradient(centerX, centerY - 8, 0, centerX, centerY - 8, this.width / 2.2);
+        headGradient.addColorStop(0, '#000428');
+        headGradient.addColorStop(0.7, '#001f3f');
+        headGradient.addColorStop(1, '#003366');
+        ctx.fillStyle = headGradient;
         ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.arc(centerX, centerY - 8, this.width / 2.2, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // サイバー耳（アンテナ風）
-        ctx.fillStyle = '#00ff41';
+        // 超派手なサイバー耳（アンテナ風、パルス効果付き）
+        const pulse = Math.sin(performance.now() * 0.02) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(0, 255, 65, ${pulse})`;
         ctx.strokeStyle = '#06ffa5';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         
-        // 左アンテナ
+        // 左アンテナ（より大きく）
         ctx.beginPath();
-        ctx.moveTo(centerX - 12, centerY - 18);
-        ctx.lineTo(centerX - 8, centerY - 28);
-        ctx.lineTo(centerX - 4, centerY - 18);
+        ctx.moveTo(centerX - 15, centerY - 18);
+        ctx.lineTo(centerX - 10, centerY - 35);
+        ctx.lineTo(centerX - 5, centerY - 18);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // 右アンテナ
+        // 右アンテナ（より大きく）
         ctx.beginPath();
-        ctx.moveTo(centerX + 4, centerY - 18);
-        ctx.lineTo(centerX + 8, centerY - 28);
-        ctx.lineTo(centerX + 12, centerY - 18);
+        ctx.moveTo(centerX + 5, centerY - 18);
+        ctx.lineTo(centerX + 10, centerY - 35);
+        ctx.lineTo(centerX + 15, centerY - 18);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // サイバー目（HUD風）
-        ctx.fillStyle = '#00ff41';
+        // アンテナの先端にパーティクル効果
+        ctx.fillStyle = '#ff006e';
+        ctx.beginPath();
+        ctx.arc(centerX - 10, centerY - 35, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 10, centerY - 35, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 超派手なサイバー目（HUD風、アニメーション付き）
+        const eyePulse = Math.sin(performance.now() * 0.03) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(0, 255, 65, ${eyePulse})`;
         ctx.strokeStyle = '#06ffa5';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(centerX - 8, centerY - 12, 6, 0, Math.PI * 2);
+        ctx.arc(centerX - 8, centerY - 12, 7, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
         ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 12, 6, 0, Math.PI * 2);
+        ctx.arc(centerX + 8, centerY - 12, 7, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // 目のハイライト（ピクセル風）
+        // 目のハイライト（より大きく）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(centerX - 6, centerY - 14, 2, 0, Math.PI * 2);
+        ctx.arc(centerX - 6, centerY - 14, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 10, centerY - 14, 2, 0, Math.PI * 2);
+        ctx.arc(centerX + 10, centerY - 14, 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // サイバー鼻（センサー風）
-        ctx.fillStyle = '#ff006e';
+        // 超派手なサイバー鼻（センサー風、色変化）
+        const noseColors = ['#ff006e', '#8338ec', '#ffbe0b', '#fb5607'];
+        const noseIndex = Math.floor(performance.now() * 0.02) % noseColors.length;
+        ctx.fillStyle = noseColors[noseIndex];
         ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(centerX, centerY - 2, 3, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY - 2, 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // サイバー口（スピーカー風）
+        // 超派手なサイバー口（スピーカー風、音波効果）
         ctx.fillStyle = '#8338ec';
         ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0.2, Math.PI - 0.2);
+        ctx.arc(centerX, centerY, 10, 0.2, Math.PI - 0.2);
         ctx.fill();
         ctx.stroke();
         
-        // サイバーアーム（武器システム）
+        // 音波効果
+        const waveCount = 3;
+        for (let i = 0; i < waveCount; i++) {
+            const waveAlpha = 0.3 - (i * 0.1);
+            ctx.strokeStyle = `rgba(131, 56, 236, ${waveAlpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 10 + (i * 5), 0.2, Math.PI - 0.2);
+            ctx.stroke();
+        }
+        
+        // 超派手なサイバーアーム（武器システム、より大きく）
         ctx.fillStyle = '#1a1a2e';
         ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         
-        // 左手
+        // 左手（より大きく）
         ctx.beginPath();
-        ctx.arc(centerX - 18, centerY + 2, 4, 0, Math.PI * 2);
+        ctx.arc(centerX - 22, centerY + 2, 6, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // 右手
+        // 右手（より大きく）
         ctx.beginPath();
-        ctx.arc(centerX + 18, centerY + 2, 4, 0, Math.PI * 2);
+        ctx.arc(centerX + 22, centerY + 2, 6, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // サイバーエフェクト（パルス）
-        const pulse = Math.sin(performance.now() * 0.01) * 0.3 + 0.7;
-        ctx.strokeStyle = `rgba(0, 255, 65, ${pulse})`;
+        // アームの武器エフェクト
+        ctx.fillStyle = '#ff006e';
+        ctx.beginPath();
+        ctx.arc(centerX - 22, centerY + 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 22, centerY + 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 超派手なサイバーエフェクト（パルス + 回転）
+        const outerPulse = Math.sin(performance.now() * 0.01) * 0.3 + 0.7;
+        ctx.strokeStyle = `rgba(0, 255, 65, ${outerPulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - 8, this.width / 2.2 + 3, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 追加の回転エフェクト
+        ctx.save();
+        ctx.translate(centerX, centerY - 8);
+        ctx.rotate(performance.now() * 0.003);
+        ctx.strokeStyle = `rgba(255, 0, 110, ${outerPulse})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(centerX, centerY - 8, this.width / 2.2 + 2, 0, Math.PI * 2);
+        ctx.moveTo(-this.width / 2.2, 0);
+        ctx.lineTo(this.width / 2.2, 0);
+        ctx.moveTo(0, -this.width / 2.2);
+        ctx.lineTo(0, this.width / 2.2);
         ctx.stroke();
+        ctx.restore();
 
         ctx.restore();
     }
@@ -240,53 +310,111 @@ export class Bullet extends GameObject {
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.save();
         
-        // レトロアニメ風のサイバー弾
+        // 超派手なサイバー弾
         const centerX = this.x + this.width / 2;
         const centerY = this.y + this.height / 2;
         
-        // 外側のネオン効果
-        ctx.fillStyle = 'rgba(0, 255, 65, 0.3)';
+        // 超派手な外側のネオン効果（虹色）
+        const outerColors = ['#ff006e', '#00ff41', '#8338ec', '#ffbe0b', '#fb5607'];
+        const outerIndex = Math.floor(performance.now() * 0.02) % outerColors.length;
+        ctx.fillStyle = `${outerColors[outerIndex]}30`;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, this.width / 2 + 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 中層のネオン効果
+        ctx.fillStyle = `${outerColors[(outerIndex + 1) % outerColors.length]}40`;
         ctx.beginPath();
         ctx.arc(centerX, centerY, this.width / 2 + 3, 0, Math.PI * 2);
         ctx.fill();
         
-        // サイバー弾の本体
-        ctx.fillStyle = '#00ff41';
+        // 超派手なサイバー弾の本体（グラデーション）
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, this.width / 2 + 1);
+        gradient.addColorStop(0, '#00ff41');
+        gradient.addColorStop(0.7, '#06ffa5');
+        gradient.addColorStop(1, '#00cc88');
+        ctx.fillStyle = gradient;
         ctx.strokeStyle = '#06ffa5';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(centerX, centerY, this.width / 2 + 1, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // 内側のコア
+        // 内側のコア（より大きく）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(centerX, centerY, this.width / 2 - 1, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, this.width / 2, 0, Math.PI * 2);
         ctx.fill();
         
-        // サイバーエフェクト（回転）
-        const rotation = performance.now() * 0.01;
+        // コアのハイライト
+        ctx.fillStyle = '#ffff00';
+        ctx.beginPath();
+        ctx.arc(centerX - 1, centerY - 1, this.width / 2 - 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 超派手なサイバーエフェクト（多重回転）
+        const rotation1 = performance.now() * 0.015;
+        const rotation2 = performance.now() * 0.01;
+        
+        // 第一層の回転エフェクト
         ctx.strokeStyle = '#ff006e';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.save();
         ctx.translate(centerX, centerY);
-        ctx.rotate(rotation);
+        ctx.rotate(rotation1);
         ctx.beginPath();
-        ctx.moveTo(-this.width / 2, 0);
-        ctx.lineTo(this.width / 2, 0);
-        ctx.moveTo(0, -this.width / 2);
-        ctx.lineTo(0, this.width / 2);
+        ctx.moveTo(-this.width / 2 - 2, 0);
+        ctx.lineTo(this.width / 2 + 2, 0);
+        ctx.moveTo(0, -this.width / 2 - 2);
+        ctx.lineTo(0, this.width / 2 + 2);
         ctx.stroke();
         ctx.restore();
         
-        // パルス効果
-        const pulse = Math.sin(performance.now() * 0.02) * 0.5 + 0.5;
-        ctx.strokeStyle = `rgba(0, 255, 65, ${pulse})`;
+        // 第二層の回転エフェクト
+        ctx.strokeStyle = '#8338ec';
+        ctx.lineWidth = 1;
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(-rotation2);
+        ctx.beginPath();
+        ctx.moveTo(-this.width / 2 - 1, 0);
+        ctx.lineTo(this.width / 2 + 1, 0);
+        ctx.moveTo(0, -this.width / 2 - 1);
+        ctx.lineTo(0, this.width / 2 + 1);
+        ctx.stroke();
+        ctx.restore();
+        
+        // 超派手なパルス効果（多重）
+        const pulse1 = Math.sin(performance.now() * 0.03) * 0.5 + 0.5;
+        const pulse2 = Math.sin(performance.now() * 0.02) * 0.3 + 0.7;
+        
+        ctx.strokeStyle = `rgba(0, 255, 65, ${pulse1})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, this.width / 2 + 3, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.strokeStyle = `rgba(255, 0, 110, ${pulse2})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, this.width / 2 + 2, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, this.width / 2 + 4, 0, Math.PI * 2);
         ctx.stroke();
+        
+        // 追加の星型エフェクト
+        ctx.strokeStyle = '#ffbe0b';
+        ctx.lineWidth = 1;
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(performance.now() * 0.005);
+        for (let i = 0; i < 4; i++) {
+            ctx.rotate(Math.PI / 2);
+            ctx.beginPath();
+            ctx.moveTo(-this.width / 2 - 1, 0);
+            ctx.lineTo(this.width / 2 + 1, 0);
+            ctx.stroke();
+        }
+        ctx.restore();
         
         ctx.restore();
     }
@@ -344,94 +472,151 @@ export class Enemy extends GameObject {
         const centerY = this.y + this.height / 2;
         const bounce = Math.sin(this.animationFrame * 0.1) * 1;
         
-        // サイバー影
-        ctx.fillStyle = 'rgba(255, 0, 110, 0.3)';
+        // 超派手なサイバー影（虹色効果）
+        const shadowColors = ['#ff006e', '#8338ec', '#ffbe0b', '#fb5607', '#00ff41'];
+        const shadowIndex = Math.floor(this.animationFrame * 0.1) % shadowColors.length;
+        ctx.fillStyle = `${shadowColors[shadowIndex]}40`;
         ctx.beginPath();
         ctx.ellipse(centerX, this.y + this.height + 2, this.width / 2.5, 3, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // 体（サイバーロボット風）
-        ctx.fillStyle = '#1a1a2e';
+        // 体（超派手なサイバーロボット風、グラデーション付き）
+        const bodyGradient = ctx.createRadialGradient(centerX, centerY + bounce, 0, centerX, centerY + bounce, this.width / 2.5);
+        bodyGradient.addColorStop(0, '#1a1a2e');
+        bodyGradient.addColorStop(0.6, '#16213e');
+        bodyGradient.addColorStop(1, '#0f3460');
+        ctx.fillStyle = bodyGradient;
         ctx.strokeStyle = '#ff006e';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.ellipse(centerX, centerY + bounce, this.width / 2.5, this.height / 2.5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // サイバー装甲の装飾
+        // 超派手なサイバー装甲の装飾（回転する装飾）
+        const rotation = this.animationFrame * 0.02;
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(rotation);
+        
         ctx.fillStyle = '#8338ec';
         ctx.beginPath();
-        ctx.arc(centerX - 8, centerY - 5 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(-8, -5, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 6, centerY + 3 + bounce, 3, 0, Math.PI * 2);
+        ctx.arc(6, 3, 4, 0, Math.PI * 2);
         ctx.fill();
-
-        // サイバーアンテナ（耳）
-        ctx.fillStyle = '#ff006e';
-        ctx.strokeStyle = '#8338ec';
-        ctx.lineWidth = 2;
         
-        // 左アンテナ
-        ctx.beginPath();
-        ctx.ellipse(centerX - 12, centerY - 8 + bounce, 6, 10, Math.PI / 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        
-        // 右アンテナ
-        ctx.beginPath();
-        ctx.ellipse(centerX + 12, centerY - 8 + bounce, 6, 10, -Math.PI / 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        // サイバーセンサー（目）
-        ctx.fillStyle = '#ff006e';
-        ctx.strokeStyle = '#8338ec';
+        // 追加の装飾リング
+        ctx.strokeStyle = '#ffbe0b';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(centerX - 6, centerY - 8 + bounce, 4, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.arc(0, 0, this.width / 2.5 - 3, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
+
+        // 超派手なサイバーアンテナ（耳、より大きく）
+        const antennaPulse = Math.sin(this.animationFrame * 0.15) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 0, 110, ${antennaPulse})`;
+        ctx.strokeStyle = '#8338ec';
+        ctx.lineWidth = 3;
+        
+        // 左アンテナ（より大きく）
         ctx.beginPath();
-        ctx.arc(centerX + 6, centerY - 8 + bounce, 4, 0, Math.PI * 2);
+        ctx.ellipse(centerX - 15, centerY - 8 + bounce, 8, 15, Math.PI / 6, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // センサーのハイライト
+        // 右アンテナ（より大きく）
+        ctx.beginPath();
+        ctx.ellipse(centerX + 15, centerY - 8 + bounce, 8, 15, -Math.PI / 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // アンテナの先端にパーティクル効果
+        ctx.fillStyle = '#ffbe0b';
+        ctx.beginPath();
+        ctx.arc(centerX - 15, centerY - 20 + bounce, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 15, centerY - 20 + bounce, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 超派手なサイバーセンサー（目、アニメーション付き）
+        const eyePulse = Math.sin(this.animationFrame * 0.2) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(255, 0, 110, ${eyePulse})`;
+        ctx.strokeStyle = '#8338ec';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX - 8, centerY - 8 + bounce, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(centerX + 8, centerY - 8 + bounce, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // センサーのハイライト（より大きく）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(centerX - 4, centerY - 10 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX - 6, centerY - 10 + bounce, 2.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 10 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX + 10, centerY - 10 + bounce, 2.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // サイバーセンサー（鼻）
-        ctx.fillStyle = '#00ff41';
-        ctx.strokeStyle = '#ff006e';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY - 2 + bounce, 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        
-        // サイバースピーカー（口）
-        ctx.fillStyle = '#8338ec';
+        // 超派手なサイバーセンサー（鼻、色変化）
+        const noseColors = ['#00ff41', '#ffbe0b', '#fb5607', '#8338ec'];
+        const noseIndex = Math.floor(this.animationFrame * 0.1) % noseColors.length;
+        ctx.fillStyle = noseColors[noseIndex];
         ctx.strokeStyle = '#ff006e';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 2 + bounce, 6, 0.3, Math.PI - 0.3);
+        ctx.arc(centerX, centerY - 2 + bounce, 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // サイバーエフェクト（パルス）
-        const pulse = Math.sin(this.animationFrame * 0.1) * 0.5 + 0.5;
-        ctx.strokeStyle = `rgba(255, 0, 110, ${pulse})`;
+        // 超派手なサイバースピーカー（口、音波効果）
+        ctx.fillStyle = '#8338ec';
+        ctx.strokeStyle = '#ff006e';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + 2 + bounce, 8, 0.3, Math.PI - 0.3);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 音波効果
+        const waveCount = 3;
+        for (let i = 0; i < waveCount; i++) {
+            const waveAlpha = 0.4 - (i * 0.1);
+            ctx.strokeStyle = `rgba(131, 56, 236, ${waveAlpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY + 2 + bounce, 8 + (i * 4), 0.3, Math.PI - 0.3);
+            ctx.stroke();
+        }
+        
+        // 超派手なサイバーエフェクト（パルス + 回転）
+        const outerPulse = Math.sin(this.animationFrame * 0.1) * 0.5 + 0.5;
+        ctx.strokeStyle = `rgba(255, 0, 110, ${outerPulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + bounce, this.width / 2.5 + 3, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 追加の回転エフェクト
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(this.animationFrame * 0.01);
+        ctx.strokeStyle = `rgba(255, 190, 11, ${outerPulse})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + bounce, this.width / 2.5 + 2, 0, Math.PI * 2);
+        ctx.moveTo(-this.width / 2.5, 0);
+        ctx.lineTo(this.width / 2.5, 0);
+        ctx.moveTo(0, -this.width / 2.5);
+        ctx.lineTo(0, this.width / 2.5);
         ctx.stroke();
+        ctx.restore();
     }
 
     private drawBird(ctx: CanvasRenderingContext2D): void {
@@ -439,97 +624,164 @@ export class Enemy extends GameObject {
         const centerY = this.y + this.height / 2;
         const bounce = Math.sin(this.animationFrame * 0.15) * 1.5;
         
-        // サイバー影
-        ctx.fillStyle = 'rgba(0, 102, 255, 0.3)';
+        // 超派手なサイバー影（虹色効果）
+        const shadowColors = ['#0066ff', '#00ccff', '#ff006e', '#ffbe0b', '#8338ec'];
+        const shadowIndex = Math.floor(this.animationFrame * 0.15) % shadowColors.length;
+        ctx.fillStyle = `${shadowColors[shadowIndex]}40`;
         ctx.beginPath();
         ctx.ellipse(centerX, this.y + this.height + 2, this.width / 2.5, 3, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // 体（サイバードローン風）
-        ctx.fillStyle = '#000428';
+        // 体（超派手なサイバードローン風、グラデーション付き）
+        const bodyGradient = ctx.createRadialGradient(centerX, centerY + bounce, 0, centerX, centerY + bounce, this.width / 2.2);
+        bodyGradient.addColorStop(0, '#000428');
+        bodyGradient.addColorStop(0.6, '#001f3f');
+        bodyGradient.addColorStop(1, '#003366');
+        ctx.fillStyle = bodyGradient;
         ctx.strokeStyle = '#0066ff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.ellipse(centerX, centerY + bounce, this.width / 2.2, this.height / 2.2, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // サイバー装甲の装飾
+        // 超派手なサイバー装甲の装飾（回転する装飾）
+        const rotation = this.animationFrame * 0.03;
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(rotation);
+        
         ctx.fillStyle = '#00ccff';
         ctx.beginPath();
-        ctx.ellipse(centerX - 6, centerY - 3 + bounce, 4, 6, Math.PI / 4, 0, Math.PI * 2);
+        ctx.ellipse(-6, -3, 5, 7, Math.PI / 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.ellipse(centerX + 6, centerY - 3 + bounce, 4, 6, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.ellipse(6, -3, 5, 7, -Math.PI / 4, 0, Math.PI * 2);
         ctx.fill();
-
-        // サイバー翼（プロペラ風）
-        ctx.fillStyle = '#0066ff';
-        ctx.strokeStyle = '#00ccff';
-        ctx.lineWidth = 2;
-        const wingFlap = Math.sin(this.animationFrame * 0.4) * 15;
         
-        // 左プロペラ
+        // 追加の装飾リング
+        ctx.strokeStyle = '#ffbe0b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.width / 2.2 - 3, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 超派手なサイバー翼（プロペラ風、より大きく）
+        const wingPulse = Math.sin(this.animationFrame * 0.2) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(0, 102, 255, ${wingPulse})`;
+        ctx.strokeStyle = '#00ccff';
+        ctx.lineWidth = 3;
+        const wingFlap = Math.sin(this.animationFrame * 0.4) * 20;
+        
+        // 左プロペラ（より大きく）
         ctx.save();
-        ctx.translate(centerX - 15, centerY + bounce);
+        ctx.translate(centerX - 18, centerY + bounce);
         ctx.rotate((wingFlap * Math.PI) / 180);
         ctx.beginPath();
-        ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 10, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
         
-        // 右プロペラ
+        // 右プロペラ（より大きく）
         ctx.save();
-        ctx.translate(centerX + 15, centerY + bounce);
+        ctx.translate(centerX + 18, centerY + bounce);
         ctx.rotate((-wingFlap * Math.PI) / 180);
         ctx.beginPath();
-        ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 10, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
 
-        // サイバーセンサー（目）
-        ctx.fillStyle = '#0066ff';
-        ctx.strokeStyle = '#00ccff';
-        ctx.lineWidth = 2;
+        // プロペラの先端にパーティクル効果
+        ctx.fillStyle = '#ff006e';
+        ctx.save();
+        ctx.translate(centerX - 18, centerY + bounce);
+        ctx.rotate((wingFlap * Math.PI) / 180);
         ctx.beginPath();
-        ctx.arc(centerX - 6, centerY - 6 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(10, 0, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.translate(centerX + 18, centerY + bounce);
+        ctx.rotate((-wingFlap * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.arc(10, 0, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 超派手なサイバーセンサー（目、アニメーション付き）
+        const eyePulse = Math.sin(this.animationFrame * 0.25) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(0, 102, 255, ${eyePulse})`;
+        ctx.strokeStyle = '#00ccff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX - 8, centerY - 6 + bounce, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(centerX + 6, centerY - 6 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(centerX + 8, centerY - 6 + bounce, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // センサーのハイライト
+        // センサーのハイライト（より大きく）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(centerX - 4, centerY - 8 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX - 6, centerY - 8 + bounce, 2.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 8 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX + 10, centerY - 8 + bounce, 2.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // サイバーレーザー（くちばし）
-        ctx.fillStyle = '#ff006e';
+        // 超派手なサイバーレーザー（くちばし、色変化）
+        const beakColors = ['#ff006e', '#ffbe0b', '#fb5607', '#8338ec'];
+        const beakIndex = Math.floor(this.animationFrame * 0.15) % beakColors.length;
+        ctx.fillStyle = beakColors[beakIndex];
         ctx.strokeStyle = '#0066ff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(centerX, centerY - 2 + bounce);
-        ctx.lineTo(centerX + 8, centerY - 8 + bounce);
-        ctx.lineTo(centerX + 6, centerY + 2 + bounce);
+        ctx.lineTo(centerX + 10, centerY - 10 + bounce);
+        ctx.lineTo(centerX + 8, centerY + 2 + bounce);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // サイバーエフェクト（パルス）
-        const pulse = Math.sin(this.animationFrame * 0.15) * 0.5 + 0.5;
-        ctx.strokeStyle = `rgba(0, 102, 255, ${pulse})`;
+        // レーザーの光線効果
+        const laserCount = 3;
+        for (let i = 0; i < laserCount; i++) {
+            const laserAlpha = 0.4 - (i * 0.1);
+            ctx.strokeStyle = `rgba(255, 0, 110, ${laserAlpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - 2 + bounce);
+            ctx.lineTo(centerX + 10 + (i * 3), centerY - 10 + bounce);
+            ctx.stroke();
+        }
+        
+        // 超派手なサイバーエフェクト（パルス + 回転）
+        const outerPulse = Math.sin(this.animationFrame * 0.15) * 0.5 + 0.5;
+        ctx.strokeStyle = `rgba(0, 102, 255, ${outerPulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + bounce, this.width / 2.2 + 3, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 追加の回転エフェクト
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(this.animationFrame * 0.02);
+        ctx.strokeStyle = `rgba(0, 204, 255, ${outerPulse})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + bounce, this.width / 2.2 + 2, 0, Math.PI * 2);
+        ctx.moveTo(-this.width / 2.2, 0);
+        ctx.lineTo(this.width / 2.2, 0);
+        ctx.moveTo(0, -this.width / 2.2);
+        ctx.lineTo(0, this.width / 2.2);
         ctx.stroke();
+        ctx.restore();
     }
 
     private drawRabbit(ctx: CanvasRenderingContext2D): void {
@@ -537,120 +789,186 @@ export class Enemy extends GameObject {
         const centerY = this.y + this.height / 2;
         const bounce = Math.sin(this.animationFrame * 0.12) * 1;
         
-        // 影
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        // 超派手な影（虹色効果）
+        const shadowColors = ['#FF69B4', '#9370DB', '#FFB6C1', '#FF1493', '#FFC0CB'];
+        const shadowIndex = Math.floor(this.animationFrame * 0.12) % shadowColors.length;
+        ctx.fillStyle = `${shadowColors[shadowIndex]}40`;
         ctx.beginPath();
         ctx.ellipse(centerX, this.y + this.height + 2, this.width / 2.5, 3, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // 体（カップヘッド風の白いベース）
-        ctx.fillStyle = '#FFFFFF';
+        // 体（超派手なカップヘッド風の白いベース、グラデーション付き）
+        const bodyGradient = ctx.createRadialGradient(centerX, centerY + bounce, 0, centerX, centerY + bounce, this.width / 2.3);
+        bodyGradient.addColorStop(0, '#FFFFFF');
+        bodyGradient.addColorStop(0.7, '#F8F8FF');
+        bodyGradient.addColorStop(1, '#E6E6FA');
+        ctx.fillStyle = bodyGradient;
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.ellipse(centerX, centerY + bounce, this.width / 2.3, this.height / 2.3, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // 紫の斑点模様
-        ctx.fillStyle = '#9370DB';
+        // 超派手な紫の斑点模様（アニメーション付き）
+        const spotPulse = Math.sin(this.animationFrame * 0.1) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(147, 112, 219, ${spotPulse})`;
         ctx.beginPath();
-        ctx.arc(centerX - 5, centerY - 4 + bounce, 3, 0, Math.PI * 2);
+        ctx.arc(centerX - 5, centerY - 4 + bounce, 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 7, centerY + 2 + bounce, 2, 0, Math.PI * 2);
+        ctx.arc(centerX + 7, centerY + 2 + bounce, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 追加の装飾斑点
+        ctx.fillStyle = `rgba(255, 105, 180, ${spotPulse})`;
+        ctx.beginPath();
+        ctx.arc(centerX - 2, centerY + 6 + bounce, 2, 0, Math.PI * 2);
         ctx.fill();
 
-        // カップヘッド風の長い耳（アニメーション付き）
-        ctx.fillStyle = '#FFB6C1';
+        // 超派手なカップヘッド風の長い耳（アニメーション付き、より大きく）
+        const earPulse = Math.sin(this.animationFrame * 0.15) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 182, 193, ${earPulse})`;
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        const earSway = Math.sin(this.animationFrame * 0.08) * 8;
+        
+        // 左耳（より大きく）
+        ctx.save();
+        ctx.translate(centerX - 10, centerY - 18 + bounce);
+        ctx.rotate((earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 5, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        
+        // 右耳（より大きく）
+        ctx.save();
+        ctx.translate(centerX + 10, centerY - 18 + bounce);
+        ctx.rotate((-earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 5, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        
+        // 耳の内側（より派手）
+        ctx.fillStyle = `rgba(255, 105, 180, ${earPulse})`;
+        ctx.save();
+        ctx.translate(centerX - 10, centerY - 18 + bounce);
+        ctx.rotate((earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 3, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.translate(centerX + 10, centerY - 18 + bounce);
+        ctx.rotate((-earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 3, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 耳の先端にパーティクル効果
+        ctx.fillStyle = '#FF1493';
+        ctx.save();
+        ctx.translate(centerX - 10, centerY - 18 + bounce);
+        ctx.rotate((earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.arc(0, -18, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        ctx.save();
+        ctx.translate(centerX + 10, centerY - 18 + bounce);
+        ctx.rotate((-earSway * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.arc(0, -18, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 超派手なカップヘッド風の大きな目（アニメーション付き）
+        const eyePulse = Math.sin(this.animationFrame * 0.2) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(0, 0, 0, ${eyePulse})`;
+        ctx.beginPath();
+        ctx.arc(centerX - 8, centerY - 6 + bounce, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 8, centerY - 6 + bounce, 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 目のハイライト（より大きく）
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(centerX - 6, centerY - 8 + bounce, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 10, centerY - 8 + bounce, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 超派手なピンクの鼻（ハート型風、色変化）
+        const noseColors = ['#FF1493', '#FF69B4', '#FFB6C1', '#FFC0CB'];
+        const noseIndex = Math.floor(this.animationFrame * 0.1) % noseColors.length;
+        ctx.fillStyle = noseColors[noseIndex];
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2;
-        const earSway = Math.sin(this.animationFrame * 0.08) * 5;
-        
-        // 左耳
-        ctx.save();
-        ctx.translate(centerX - 8, centerY - 15 + bounce);
-        ctx.rotate((earSway * Math.PI) / 180);
         ctx.beginPath();
-        ctx.ellipse(0, 0, 4, 15, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-        
-        // 右耳
-        ctx.save();
-        ctx.translate(centerX + 8, centerY - 15 + bounce);
-        ctx.rotate((-earSway * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 4, 15, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-        
-        // 耳の内側
-        ctx.fillStyle = '#FF69B4';
-        ctx.save();
-        ctx.translate(centerX - 8, centerY - 15 + bounce);
-        ctx.rotate((earSway * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 2, 10, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        
-        ctx.save();
-        ctx.translate(centerX + 8, centerY - 15 + bounce);
-        ctx.rotate((-earSway * Math.PI) / 180);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 2, 10, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // カップヘッド風の大きな目
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(centerX - 6, centerY - 6 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(centerX - 1, centerY - 1 + bounce, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 6, centerY - 6 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(centerX + 1, centerY - 1 + bounce, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(centerX - 3, centerY + bounce);
+        ctx.lineTo(centerX, centerY + 4 + bounce);
+        ctx.lineTo(centerX + 3, centerY + bounce);
         ctx.fill();
         
-        // 目のハイライト
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(centerX - 4, centerY - 8 + bounce, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 8 + bounce, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // ピンクの鼻（ハート型風）
-        ctx.fillStyle = '#FF1493';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(centerX - 1, centerY - 1 + bounce, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centerX + 1, centerY - 1 + bounce, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(centerX - 2, centerY + bounce);
-        ctx.lineTo(centerX, centerY + 3 + bounce);
-        ctx.lineTo(centerX + 2, centerY + bounce);
-        ctx.fill();
-        
-        // 前歯
+        // 超派手な前歯（より大きく）
         ctx.fillStyle = '#FFFFFF';
         ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.rect(centerX - 3, centerY + 4 + bounce, 3, 5);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.rect(centerX + 1, centerY + 4 + bounce, 3, 5);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 歯のハイライト
+        ctx.fillStyle = '#FFFFE0';
+        ctx.beginPath();
+        ctx.rect(centerX - 2, centerY + 5 + bounce, 2, 3);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.rect(centerX + 2, centerY + 5 + bounce, 2, 3);
+        ctx.fill();
+        
+        // 超派手なエフェクト（パルス + 回転）
+        const outerPulse = Math.sin(this.animationFrame * 0.12) * 0.5 + 0.5;
+        ctx.strokeStyle = `rgba(255, 105, 180, ${outerPulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + bounce, this.width / 2.3 + 3, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 追加の回転エフェクト
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(this.animationFrame * 0.01);
+        ctx.strokeStyle = `rgba(147, 112, 219, ${outerPulse})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.rect(centerX - 2, centerY + 4 + bounce, 2, 4);
-        ctx.fill();
+        ctx.moveTo(-this.width / 2.3, 0);
+        ctx.lineTo(this.width / 2.3, 0);
+        ctx.moveTo(0, -this.width / 2.3);
+        ctx.lineTo(0, this.width / 2.3);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.rect(centerX + 1, centerY + 4 + bounce, 2, 4);
-        ctx.fill();
-        ctx.stroke();
+        ctx.restore();
     }
 
     private drawPig(ctx: CanvasRenderingContext2D): void {
@@ -658,130 +976,195 @@ export class Enemy extends GameObject {
         const centerY = this.y + this.height / 2;
         const bounce = Math.sin(this.animationFrame * 0.08) * 2;
         
-        // 影（より大きく）
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        // 超派手な影（虹色効果、より大きく）
+        const shadowColors = ['#FF69B4', '#FFB6C1', '#FF1493', '#FFC0CB', '#FF69B4'];
+        const shadowIndex = Math.floor(this.animationFrame * 0.08) % shadowColors.length;
+        ctx.fillStyle = `${shadowColors[shadowIndex]}50`;
         ctx.beginPath();
         ctx.ellipse(centerX, this.y + this.height + 3, this.width / 2, 4, 0, 0, Math.PI * 2);
         ctx.fill();
         
-        // 体（カップヘッド風の白いベース、より大きく）
-        ctx.fillStyle = '#FFFFFF';
+        // 体（超派手なカップヘッド風の白いベース、グラデーション付き、より大きく）
+        const bodyGradient = ctx.createRadialGradient(centerX, centerY + bounce, 0, centerX, centerY + bounce, this.width / 2);
+        bodyGradient.addColorStop(0, '#FFFFFF');
+        bodyGradient.addColorStop(0.7, '#F8F8FF');
+        bodyGradient.addColorStop(1, '#E6E6FA');
+        ctx.fillStyle = bodyGradient;
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.ellipse(centerX, centerY + bounce, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
-        // ピンクの斑点模様
-        ctx.fillStyle = '#FF69B4';
+        // 超派手なピンクの斑点模様（アニメーション付き）
+        const spotPulse = Math.sin(this.animationFrame * 0.1) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 105, 180, ${spotPulse})`;
         ctx.beginPath();
-        ctx.arc(centerX - 8, centerY - 6 + bounce, 4, 0, Math.PI * 2);
+        ctx.arc(centerX - 8, centerY - 6 + bounce, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 6, centerY + 4 + bounce, 3, 0, Math.PI * 2);
+        ctx.arc(centerX + 6, centerY + 4 + bounce, 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX - 2, centerY + 8 + bounce, 2, 0, Math.PI * 2);
+        ctx.arc(centerX - 2, centerY + 8 + bounce, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 追加の装飾斑点
+        ctx.fillStyle = `rgba(255, 182, 193, ${spotPulse})`;
+        ctx.beginPath();
+        ctx.arc(centerX + 8, centerY - 4 + bounce, 2, 0, Math.PI * 2);
         ctx.fill();
 
-        // カップヘッド風の小さな三角耳
-        ctx.fillStyle = '#FFB6C1';
+        // 超派手なカップヘッド風の小さな三角耳（より大きく）
+        const earPulse = Math.sin(this.animationFrame * 0.15) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(255, 182, 193, ${earPulse})`;
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         
-        // 左耳
+        // 左耳（より大きく）
         ctx.beginPath();
-        ctx.moveTo(centerX - 12, centerY - 12 + bounce);
-        ctx.lineTo(centerX - 8, centerY - 20 + bounce);
-        ctx.lineTo(centerX - 4, centerY - 12 + bounce);
+        ctx.moveTo(centerX - 15, centerY - 15 + bounce);
+        ctx.lineTo(centerX - 10, centerY - 25 + bounce);
+        ctx.lineTo(centerX - 5, centerY - 15 + bounce);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
-        // 右耳
+        // 右耳（より大きく）
         ctx.beginPath();
-        ctx.moveTo(centerX + 4, centerY - 12 + bounce);
-        ctx.lineTo(centerX + 8, centerY - 20 + bounce);
-        ctx.lineTo(centerX + 12, centerY - 12 + bounce);
+        ctx.moveTo(centerX + 5, centerY - 15 + bounce);
+        ctx.lineTo(centerX + 10, centerY - 25 + bounce);
+        ctx.lineTo(centerX + 15, centerY - 15 + bounce);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
 
-        // カップヘッド風の大きな目（少し怒った表情）
-        ctx.fillStyle = '#000000';
+        // 耳の先端にパーティクル効果
+        ctx.fillStyle = '#FF1493';
         ctx.beginPath();
-        ctx.arc(centerX - 8, centerY - 8 + bounce, 5, 0, Math.PI * 2);
+        ctx.arc(centerX - 10, centerY - 25 + bounce, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 8, centerY - 8 + bounce, 5, 0, Math.PI * 2);
+        ctx.arc(centerX + 10, centerY - 25 + bounce, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 超派手なカップヘッド風の大きな目（アニメーション付き、より怒った表情）
+        const eyePulse = Math.sin(this.animationFrame * 0.2) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(0, 0, 0, ${eyePulse})`;
+        ctx.beginPath();
+        ctx.arc(centerX - 10, centerY - 8 + bounce, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centerX + 10, centerY - 8 + bounce, 6, 0, Math.PI * 2);
         ctx.fill();
         
-        // 目のハイライト
+        // 目のハイライト（より大きく）
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
-        ctx.arc(centerX - 6, centerY - 10 + bounce, 2, 0, Math.PI * 2);
+        ctx.arc(centerX - 8, centerY - 12 + bounce, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 10, centerY - 10 + bounce, 2, 0, Math.PI * 2);
+        ctx.arc(centerX + 12, centerY - 12 + bounce, 3, 0, Math.PI * 2);
         ctx.fill();
         
-        // 怒った眉毛
+        // 超派手な怒った眉毛（アニメーション付き）
+        const eyebrowPulse = Math.sin(this.animationFrame * 0.1) * 0.3 + 0.7;
+        ctx.strokeStyle = `rgba(0, 0, 0, ${eyebrowPulse})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 15, centerY - 15 + bounce);
+        ctx.lineTo(centerX - 5, centerY - 8 + bounce);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(centerX + 5, centerY - 8 + bounce);
+        ctx.lineTo(centerX + 15, centerY - 15 + bounce);
+        ctx.stroke();
+
+        // 超派手なカップヘッド風の大きな豚の鼻（色変化）
+        const noseColors = ['#FF1493', '#FF69B4', '#FFB6C1', '#FFC0CB'];
+        const noseIndex = Math.floor(this.animationFrame * 0.1) % noseColors.length;
+        ctx.fillStyle = noseColors[noseIndex];
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(centerX - 12, centerY - 12 + bounce);
-        ctx.lineTo(centerX - 4, centerY - 8 + bounce);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(centerX + 4, centerY - 8 + bounce);
-        ctx.lineTo(centerX + 12, centerY - 12 + bounce);
-        ctx.stroke();
-
-        // カップヘッド風の大きな豚の鼻
-        ctx.fillStyle = '#FF1493';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(centerX, centerY + 2 + bounce, 6, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(centerX, centerY + 2 + bounce, 7, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // 鼻の穴
+        // 鼻の穴（より大きく）
         ctx.fillStyle = '#000000';
         ctx.beginPath();
-        ctx.arc(centerX - 2, centerY + 2 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX - 3, centerY + 2 + bounce, 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(centerX + 2, centerY + 2 + bounce, 1.5, 0, Math.PI * 2);
+        ctx.arc(centerX + 3, centerY + 2 + bounce, 2, 0, Math.PI * 2);
         ctx.fill();
         
-        // 怒った口
+        // 超派手な怒った口（より大きく）
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + 10 + bounce, 8, 0.8, Math.PI - 0.8);
+        ctx.stroke();
+        
+        // 超派手な牙（より大きく）
+        ctx.fillStyle = '#FFFFFF';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(centerX, centerY + 8 + bounce, 6, 0.8, Math.PI - 0.8);
+        ctx.moveTo(centerX - 6, centerY + 8 + bounce);
+        ctx.lineTo(centerX - 3, centerY + 15 + bounce);
+        ctx.lineTo(centerX - 8, centerY + 12 + bounce);
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
         
-        // 牙
-        ctx.fillStyle = '#FFFFFF';
-        ctx.strokeStyle = '#000000';
+        ctx.beginPath();
+        ctx.moveTo(centerX + 6, centerY + 8 + bounce);
+        ctx.lineTo(centerX + 3, centerY + 15 + bounce);
+        ctx.lineTo(centerX + 8, centerY + 12 + bounce);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // 牙のハイライト
+        ctx.fillStyle = '#FFFFE0';
+        ctx.beginPath();
+        ctx.moveTo(centerX - 5, centerY + 9 + bounce);
+        ctx.lineTo(centerX - 3, centerY + 13 + bounce);
+        ctx.lineTo(centerX - 7, centerY + 11 + bounce);
+        ctx.closePath();
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX + 5, centerY + 9 + bounce);
+        ctx.lineTo(centerX + 3, centerY + 13 + bounce);
+        ctx.lineTo(centerX + 7, centerY + 11 + bounce);
+        ctx.closePath();
+        ctx.fill();
+        
+        // 超派手なエフェクト（パルス + 回転）
+        const outerPulse = Math.sin(this.animationFrame * 0.08) * 0.5 + 0.5;
+        ctx.strokeStyle = `rgba(255, 105, 180, ${outerPulse})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY + bounce, this.width / 2 + 4, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // 追加の回転エフェクト
+        ctx.save();
+        ctx.translate(centerX, centerY + bounce);
+        ctx.rotate(this.animationFrame * 0.01);
+        ctx.strokeStyle = `rgba(255, 182, 193, ${outerPulse})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(centerX - 4, centerY + 6 + bounce);
-        ctx.lineTo(centerX - 2, centerY + 12 + bounce);
-        ctx.lineTo(centerX - 6, centerY + 10 + bounce);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(-this.width / 2, 0);
+        ctx.lineTo(this.width / 2, 0);
+        ctx.moveTo(0, -this.width / 2);
+        ctx.lineTo(0, this.width / 2);
         ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(centerX + 4, centerY + 6 + bounce);
-        ctx.lineTo(centerX + 2, centerY + 12 + bounce);
-        ctx.lineTo(centerX + 6, centerY + 10 + bounce);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        ctx.restore();
     }
 
     isOffScreen(): boolean {
@@ -828,3 +1211,4 @@ export class Particle {
         ctx.restore();
     }
 }
+
