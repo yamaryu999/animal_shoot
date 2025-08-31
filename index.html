@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>レトロアニメ どうぶつシューティング</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
         
         * {
             margin: 0;
@@ -18,8 +18,8 @@
         }
 
         body {
-            font-family: 'Orbitron', monospace;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 50%, #F5DEB3 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -36,61 +36,61 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
-                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 1px, transparent 1px);
+                radial-gradient(circle at 20% 20%, rgba(139,69,19,0.3) 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, rgba(210,180,140,0.2) 1px, transparent 1px);
             background-size: 30px 30px, 20px 20px;
             pointer-events: none;
-            animation: starfield 20s linear infinite;
+            animation: vintage 20s linear infinite;
         }
 
-        @keyframes starfield {
+        @keyframes vintage {
             0% { transform: translateY(0px); }
             100% { transform: translateY(-100px); }
         }
 
         .game-container {
             position: relative;
-            border: 8px solid #00ff41;
+            border: 8px solid #8B4513;
             border-radius: 15px;
             box-shadow: 
-                0 0 0 4px #00cc33,
-                0 0 20px rgba(0, 255, 65, 0.5),
+                0 0 0 4px #654321,
+                0 0 20px rgba(139, 69, 19, 0.5),
                 0 20px 40px rgba(0, 0, 0, 0.8),
-                inset 0 0 20px rgba(0, 255, 65, 0.1);
+                inset 0 0 20px rgba(139, 69, 19, 0.1);
             overflow: hidden;
-            background: #000000;
-            animation: glow 2s ease-in-out infinite alternate;
+            background: #F5DEB3;
+            animation: vintage-glow 3s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
-            from { box-shadow: 0 0 0 4px #00cc33, 0 0 20px rgba(0, 255, 65, 0.5), 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 65, 0.1); }
-            to { box-shadow: 0 0 0 4px #00cc33, 0 0 30px rgba(0, 255, 65, 0.8), 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 65, 0.2); }
+        @keyframes vintage-glow {
+            from { box-shadow: 0 0 0 4px #654321, 0 0 20px rgba(139, 69, 19, 0.5), 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(139, 69, 19, 0.1); }
+            to { box-shadow: 0 0 0 4px #654321, 0 0 30px rgba(139, 69, 19, 0.8), 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(139, 69, 19, 0.2); }
         }
 
         #gameCanvas {
             display: block;
-            background: linear-gradient(to bottom, #000428 0%, #004e92 50%, #000428 100%);
+            background: linear-gradient(to bottom, #D2B48C 0%, #F5DEB3 50%, #DEB887 100%);
             border-radius: 8px;
-            border: 3px solid #00ff41;
+            border: 3px solid #8B4513;
         }
 
         .ui-overlay {
             position: absolute;
             top: 20px;
             left: 20px;
-            color: #00ff41;
+            color: #8B4513;
             font-size: 18px;
             font-weight: bold;
-            font-family: 'Press Start 2P', monospace;
+            font-family: 'Source Code Pro', monospace;
             text-shadow: 
-                2px 2px 0 #000000,
-                4px 4px 0 #00cc33;
+                2px 2px 0 #F5DEB3,
+                4px 4px 0 #D2B48C;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(245, 222, 179, 0.9);
             padding: 15px 20px;
             border-radius: 10px;
-            border: 3px solid #00ff41;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+            border: 3px solid #8B4513;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.3);
         }
 
         .game-over {

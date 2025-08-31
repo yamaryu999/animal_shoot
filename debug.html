@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        .debug-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Debug Console</h1>
+    
+    <div class="debug-info">
+        <h3>ファイル読み込み状況:</h3>
+        <div id="fileStatus"></div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>エラーログ:</h3>
+        <div id="errorLog"></div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>ゲームキャンバス:</h3>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+    </div>
+
+    <script>
+        // デバッグ情報を表示する関数
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('errorLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        // ファイル読み込み状況をチェック
+        function checkFiles() {
+            const files = [
+                'game.js',
+                'game-objects.js',
+                'input-handler.js',
+                'renderer.js',
+                'story-mode.js',
+                'text-system.js',
+                'types.js'
+            ];
+            
+            const statusDiv = document.getElementById('fileStatus');
+            
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (response.ok) {
+                            statusDiv.innerHTML += `<div class="success">✅ ${file} - 読み込み成功</div>`;
+                            log(`${file} 読み込み成功`, 'success');
+                        } else {
+                            statusDiv.innerHTML += `<div class="error">❌ ${file} - 読み込み失敗 (${response.status})</div>`;
+                            log(`${file} 読み込み失敗: ${response.status}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        statusDiv.innerHTML += `<div class="error">❌ ${file} - エラー: ${error.message}</div>`;
+                        log(`${file} エラー: ${error.message}`, 'error');
+                    });
+            });
+        }
+
+        // ページ読み込み時にチェック開始
+        window.addEventListener('load', () => {
+            log('デバッグ開始');
+            checkFiles();
+            
+            // ゲームの読み込みを試行
+            setTimeout(() => {
+                try {
+                    import('./game.js').then(module => {
+                        log('ゲームモジュール読み込み成功', 'success');
+                        if (module.AnimalShootingGame) {
+                            log('AnimalShootingGameクラス発見', 'success');
+                            try {
+                                new module.AnimalShootingGame();
+                                log('ゲーム初期化成功', 'success');
+                            } catch (error) {
+                                log(`ゲーム初期化エラー: ${error.message}`, 'error');
+                            }
+                        } else {
+                            log('AnimalShootingGameクラスが見つかりません', 'error');
+                        }
+                    }).catch(error => {
+                        log(`モジュール読み込みエラー: ${error.message}`, 'error');
+                    });
+                } catch (error) {
+                    log(`ゲーム読み込みエラー: ${error.message}`, 'error');
+                }
+            }, 1000);
+        });
+
+        // グローバルエラーハンドラー
+        window.addEventListener('error', (event) => {
+            log(`グローバルエラー: ${event.error.message}`, 'error');
+        });
+
+        // 未処理のPromiseエラー
+        window.addEventListener('unhandledrejection', (event) => {
+            log(`未処理のPromiseエラー: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>
