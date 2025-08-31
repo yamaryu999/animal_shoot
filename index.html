@@ -522,6 +522,65 @@
     
     <!-- デバイス検出とUI制御 -->
     <script>
+        // 画面サイズに基づくボタン配置調整
+        function adjustButtonLayout() {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const mobileControls = document.querySelector('.mobile-controls');
+            const touchInstructions = document.querySelector('.touch-instructions');
+            const controlButtons = document.querySelectorAll('.control-button');
+            
+            if (mobileControls && touchInstructions) {
+                // 画面サイズに基づいてボタンサイズを調整
+                let buttonSize = 60;
+                let gap = 15;
+                let margin = 20;
+                let fontSize = 24;
+                
+                if (screenWidth <= 480) {
+                    buttonSize = 35;
+                    gap = 8;
+                    margin = 8;
+                    fontSize = 14;
+                } else if (screenWidth <= 768) {
+                    buttonSize = 45;
+                    gap = 10;
+                    margin = 10;
+                    fontSize = 18;
+                }
+                
+                // ボタンの位置を画面サイズに基づいて調整
+                const availableWidth = screenWidth - (margin * 2) - (buttonSize * 2) - gap;
+                const availableHeight = screenHeight - (margin * 2) - buttonSize;
+                
+                // ボタンが画面内に収まるかチェック
+                if (availableWidth < 0 || availableHeight < 0) {
+                    // 画面が小さすぎる場合は、ボタンサイズをさらに小さくする
+                    buttonSize = Math.min(buttonSize, Math.floor((screenWidth - margin * 2 - gap) / 2));
+                    buttonSize = Math.min(buttonSize, screenHeight - margin * 2);
+                    fontSize = Math.max(12, buttonSize * 0.4);
+                }
+                
+                // ボタンサイズを適用
+                controlButtons.forEach(button => {
+                    button.style.width = buttonSize + 'px';
+                    button.style.height = buttonSize + 'px';
+                    button.style.fontSize = fontSize + 'px';
+                });
+                
+                // モバイルコントロールの位置とギャップを調整
+                mobileControls.style.gap = gap + 'px';
+                mobileControls.style.bottom = margin + 'px';
+                mobileControls.style.right = margin + 'px';
+                
+                // タッチ説明の位置を調整
+                touchInstructions.style.bottom = margin + 'px';
+                touchInstructions.style.left = margin + 'px';
+                
+                console.log(`Screen: ${screenWidth}x${screenHeight}, Button size: ${buttonSize}px, Margin: ${margin}px`);
+            }
+        }
+        
         // デバイス検出とUI制御
         function detectDeviceAndSetupUI() {
             const userAgent = navigator.userAgent;
@@ -543,6 +602,9 @@
                 mobileUIElements.forEach(el => el.style.display = 'block');
                 if (mobileControls) mobileControls.style.display = 'flex';
                 if (touchInstructions) touchInstructions.style.display = 'block';
+                
+                // 画面サイズに基づいてボタン配置を調整
+                adjustButtonLayout();
             } else {
                 // デスクトップデバイス
                 desktopUIElements.forEach(el => el.style.display = 'block');
@@ -553,10 +615,26 @@
         }
         
         // ページ読み込み時に実行
-        window.addEventListener('load', detectDeviceAndSetupUI);
+        window.addEventListener('load', () => {
+            // 少し遅延させてDOMが完全に読み込まれてから実行
+            setTimeout(() => {
+                detectDeviceAndSetupUI();
+            }, 100);
+        });
         
         // ウィンドウサイズ変更時にも実行
-        window.addEventListener('resize', detectDeviceAndSetupUI);
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                detectDeviceAndSetupUI();
+            }, 100);
+        });
+        
+        // 画面の向きが変わった時にも実行
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                detectDeviceAndSetupUI();
+            }, 500);
+        });
     </script>
 </body>
 </html>
