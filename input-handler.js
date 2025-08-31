@@ -9,14 +9,15 @@ export class InputHandler {
         this.autoShoot = false;
         this.shootButtonPressed = false;
         this.canvas = canvas;
+        
         this.detectMobile();
         this.setupEventListeners();
         this.setupTouchControls();
     }
     detectMobile() {
+        // より厳密なモバイル検出（PCでもタッチ機能がある場合を考慮）
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-            ('ontouchstart' in window) ||
-            (window.innerWidth <= 768);
+            (window.innerWidth <= 768 && 'ontouchstart' in window);
     }
     setupEventListeners() {
         document.addEventListener('keydown', (e) => {

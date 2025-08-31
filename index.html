@@ -293,7 +293,7 @@
             }
 
             .mobile-controls {
-                display: flex;
+                display: flex !important;
             }
 
             .touch-instructions {
@@ -372,13 +372,13 @@
         </div>
         <div class="instructions">
             <strong>CONTROLS</strong><br>
-            <span class="desktop-controls">
+            <span class="desktop-controls" id="desktopControls">
                 ← → MOVE<br>
                 SPACE SHOOT<br>
                 STORY: SPACE<br>
                 TO CONTINUE
             </span>
-            <span class="mobile-controls-text" style="display: none;">
+            <span class="mobile-controls-text" id="mobileControls" style="display: none;">
                 TOUCH TO MOVE<br>
                 BUTTONS TO SHOOT<br>
                 STORY: TAP<br>
@@ -408,5 +408,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
     <!-- Game script -->
     <script type="module" src="game.js"></script>
+    
+    <!-- デバイス検出とUI制御 -->
+    <script>
+        // デバイス検出とUI制御
+        function detectDeviceAndSetupUI() {
+            const userAgent = navigator.userAgent;
+            const hasTouch = 'ontouchstart' in window;
+            const screenWidth = window.innerWidth;
+            
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+                            (screenWidth <= 768 && hasTouch);
+            
+
+            
+            const mobileControls = document.querySelector('.mobile-controls');
+            const desktopControls = document.getElementById('desktopControls');
+            const mobileControlsText = document.getElementById('mobileControls');
+            const touchInstructions = document.querySelector('.touch-instructions');
+            
+            if (isMobile) {
+                // モバイルデバイス
+                if (mobileControls) mobileControls.style.display = 'flex';
+                if (desktopControls) desktopControls.style.display = 'none';
+                if (mobileControlsText) mobileControlsText.style.display = 'block';
+                if (touchInstructions) touchInstructions.style.display = 'block';
+            } else {
+                // デスクトップデバイス
+                if (mobileControls) mobileControls.style.display = 'none';
+                if (desktopControls) desktopControls.style.display = 'block';
+                if (mobileControlsText) mobileControlsText.style.display = 'none';
+                if (touchInstructions) touchInstructions.style.display = 'none';
+            }
+        }
+        
+        // ページ読み込み時に実行
+        window.addEventListener('load', detectDeviceAndSetupUI);
+        
+        // ウィンドウサイズ変更時にも実行
+        window.addEventListener('resize', detectDeviceAndSetupUI);
+    </script>
 </body>
 </html>

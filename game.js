@@ -58,6 +58,20 @@ export class AnimalShootingGame {
                 this.skipStoryText();
             }
         });
+        
+        // キーボードでもストーリーをスキップできるようにする
+        document.addEventListener('keydown', (e) => {
+            if (this.storyPaused && (e.code === 'Space' || e.code === 'Enter')) {
+                this.skipStoryText();
+            }
+            
+            // Rキーでストーリーを完全にスキップしてゲームを開始
+            if (this.storyPaused && e.code === 'KeyR') {
+                this.storyPaused = false;
+                this.storyText.hide();
+                this.textDisplay.addMessage("ゲーム開始！", 200, 100, 2000, 20, '#27AE60');
+            }
+        });
     }
     initGSAPAnimations() {
         if (typeof gsap === 'undefined')
@@ -366,6 +380,7 @@ export class AnimalShootingGame {
         const currentTime = performance.now();
         const deltaTime = currentTime - this.lastFrameTime;
         this.lastFrameTime = currentTime;
+        
         if (!this.gameOver) {
             if (!this.storyPaused) {
                 this.handleInput();
