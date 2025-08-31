@@ -1,6 +1,5 @@
-import { ImprovedPlayer, ImprovedBullet, ImprovedEnemy, ImprovedParticle } from './improved-game-objects';
 // 改善版ゲームクラス
-export class ImprovedAnimalShootingGame {
+class ImprovedAnimalShootingGame {
     constructor() {
         this.bullets = [];
         this.enemies = [];
@@ -116,7 +115,7 @@ export class ImprovedAnimalShootingGame {
         this.lastShot--;
     }
     spawnEnemy() {
-        const types = ['dog', 'bird', 'rabbit', 'pig'];
+        const types = [EnemyType.DOG, EnemyType.BIRD, EnemyType.RABBIT, EnemyType.PIG];
         const randomType = types[Math.floor(Math.random() * types.length)];
         const x = Math.random() * (this.canvas.width - 35);
         const enemy = new ImprovedEnemy(x, -35, randomType);
@@ -244,4 +243,6 @@ function initImprovedGame() {
     }
 }
 // グローバル関数として公開
-window.initImprovedGame = initImprovedGame;
+if (typeof window !== 'undefined') {
+    window.initImprovedGame = initImprovedGame;
+}

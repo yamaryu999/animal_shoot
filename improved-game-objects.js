@@ -1,5 +1,5 @@
 // ゲームオブジェクトの基本クラス
-export class GameObject {
+class GameObject {
     constructor(x, y, width, height, speed, color) {
         this.x = x;
         this.y = y;
@@ -27,7 +27,7 @@ export class GameObject {
     }
 }
 // 改善版プレイヤークラス（Kenney.nl素材を参考にしたデザイン）
-export class ImprovedPlayer extends GameObject {
+class ImprovedPlayer extends GameObject {
     constructor(x, y) {
         super(x, y, 40, 40, 5, '#4A90E2');
         this.lives = 3;
@@ -370,7 +370,7 @@ export class ImprovedPlayer extends GameObject {
     }
 }
 // 改善版弾クラス
-export class ImprovedBullet extends GameObject {
+class ImprovedBullet extends GameObject {
     constructor(x, y) {
         super(x, y, 6, 12, 8, '#F5A623');
     }
@@ -410,13 +410,13 @@ export class ImprovedBullet extends GameObject {
     }
 }
 // 改善版敵クラス
-export class ImprovedEnemy extends GameObject {
+class ImprovedEnemy extends GameObject {
     constructor(x, y, type) {
         const colors = {
-            'dog': '#E67E22',
-            'bird': '#3498DB',
-            'rabbit': '#9B59B6',
-            'pig': '#E91E63'
+            [EnemyType.DOG]: '#E67E22',
+            [EnemyType.BIRD]: '#3498DB',
+            [EnemyType.RABBIT]: '#9B59B6',
+            [EnemyType.PIG]: '#E91E63'
         };
         super(x, y, 35, 35, 2, colors[type] || '#95A5A6');
         this.type = type;
@@ -558,7 +558,7 @@ export class ImprovedEnemy extends GameObject {
     }
 }
 // パーティクルエフェクトクラス
-export class ImprovedParticle {
+class ImprovedParticle {
     constructor(x, y, color) {
         this.x = x;
         this.y = y;
