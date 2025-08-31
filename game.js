@@ -1026,14 +1026,15 @@ class AnimalShootingGame {
         
         // モバイル操作関連
         this.isMobile = false;
-        this.touchControls = {};
-        this.mobileButtons = {};
+        this.touchPosition = null;
+        this.lastTouchTime = 0;
+        this.touchThreshold = 200; // タップ判定の時間閾値（ミリ秒）
         
         // モバイル検出
         this.detectMobile();
         
         this.setupEventListeners();
-        this.setupMobileControls();
+        this.setupTouchControls();
         this.startStory();
         this.gameLoop();
     }
@@ -1069,48 +1070,88 @@ class AnimalShootingGame {
         }
     }
 
-    setupMobileControls() {
+    setupTouchControls() {
         if (!this.isMobile) return;
 
-        // モバイルボタンの取得
-        this.mobileButtons.left = document.getElementById('leftBtn');
-        this.mobileButtons.right = document.getElementById('rightBtn');
-        this.mobileButtons.shoot = document.getElementById('shootBtn');
+        let touchStartTime = 0;
+        let touchStartPos = { x: 0, y: 0 };
 
-        // 左移動ボタン
-        this.setupMobileButton(this.mobileButtons.left, 'ArrowLeft');
-        
-        // 右移動ボタン
-        this.setupMobileButton(this.mobileButtons.right, 'ArrowRight');
-        
-        // 攻撃ボタン
-        this.setupMobileButton(this.mobileButtons.shoot, 'Space');
+        // タッチ開始
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (this.storyPaused) {
+                this.skipStoryText();
+                return;
+            }
+
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            touchStartTime = Date.now();
+            touchStartPos = {
+                x: (touch.clientX - rect.left) * scaleX,
+                y: (touch.clientY - rect.top) * scaleY
+            };
+
+            this.touchPosition = touchStartPos;
+            this.createTouchFeedback(touch.clientX, touch.clientY);
+        });
+
+        // タッチ移動
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (this.storyPaused) return;
+
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            this.touchPosition = {
+                x: (touch.clientX - rect.left) * scaleX,
+                y: (touch.clientY - rect.top) * scaleY
+            };
+        });
+
+        // タッチ終了
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (this.storyPaused) return;
+
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+
+            // 短いタッチ（タップ）の場合は攻撃
+            if (touchDuration < this.touchThreshold) {
+                this.shoot();
+            }
+
+            this.touchPosition = null;
+        });
+
+        // タッチキャンセル
+        this.canvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            this.touchPosition = null;
+        });
     }
 
-    setupMobileButton(button, keyCode) {
-        if (!button) return;
-
-        const startTouch = (e) => {
-            e.preventDefault();
-            this.touchControls[keyCode] = true;
-            button.classList.add('pressed');
-        };
-
-        const endTouch = (e) => {
-            e.preventDefault();
-            this.touchControls[keyCode] = false;
-            button.classList.remove('pressed');
-        };
-
-        // タッチイベント
-        button.addEventListener('touchstart', startTouch);
-        button.addEventListener('touchend', endTouch);
-        button.addEventListener('touchcancel', endTouch);
+    createTouchFeedback(clientX, clientY) {
+        const feedback = document.createElement('div');
+        feedback.className = 'touch-feedback';
+        feedback.style.left = (clientX - 20) + 'px';
+        feedback.style.top = (clientY - 20) + 'px';
         
-        // マウスイベント（デスクトップでのテスト用）
-        button.addEventListener('mousedown', startTouch);
-        button.addEventListener('mouseup', endTouch);
-        button.addEventListener('mouseleave', endTouch);
+        document.body.appendChild(feedback);
+        
+        // アニメーション終了後に削除
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, 300);
     }
     
     startStory() {
@@ -1170,18 +1211,39 @@ class AnimalShootingGame {
 
     handleInput() {
         // キーボード入力
-        const leftPressed = this.keys['ArrowLeft'] || this.touchControls['ArrowLeft'];
-        const rightPressed = this.keys['ArrowRight'] || this.touchControls['ArrowRight'];
-        const spacePressed = this.keys['Space'] || this.touchControls['Space'];
-
-        if (leftPressed) {
+        if (this.keys['ArrowLeft']) {
             this.player.moveLeft();
         }
-        if (rightPressed) {
+        if (this.keys['ArrowRight']) {
             this.player.moveRight();
         }
-        if (spacePressed) {
+        if (this.keys['Space']) {
             this.shoot();
+        }
+
+        // タッチ入力（モバイル）
+        if (this.isMobile && this.touchPosition) {
+            this.handleTouchMovement();
+        }
+    }
+
+    handleTouchMovement() {
+        if (!this.touchPosition) return;
+
+        const playerBounds = this.player.getBounds();
+        const playerCenterX = playerBounds.x + playerBounds.width / 2;
+        const touchX = this.touchPosition.x;
+
+        // タッチ位置とプレイヤーの距離を計算
+        const distance = Math.abs(touchX - playerCenterX);
+        const threshold = 10; // 移動を停止する距離の閾値
+
+        if (distance > threshold) {
+            if (touchX < playerCenterX) {
+                this.player.moveLeft();
+            } else if (touchX > playerCenterX) {
+                this.player.moveRight();
+            }
         }
     }
 
@@ -1478,7 +1540,7 @@ class AnimalShootingGame {
         this.storyText = new StoryText(this.ctx);
         
         // タッチコントロールのリセット
-        this.touchControls = {};
+        this.touchPosition = null;
         
         // ストーリー再開
         this.startStory();

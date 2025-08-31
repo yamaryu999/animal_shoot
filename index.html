@@ -134,57 +134,48 @@
             line-height: 1.3;
         }
 
-        /* モバイル用コントロール */
-        .mobile-controls {
+        /* タッチ操作用スタイル */
+        .touch-instructions {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            display: none;
-            gap: 20px;
             z-index: 30;
         }
 
-        .control-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid #000000;
-            background: linear-gradient(135deg, #FFFFFF 0%, #F0F0F0 100%);
-            color: #000000;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-            touch-action: manipulation;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: all 0.1s;
-        }
-
-        .control-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .control-button.pressed {
-            background: linear-gradient(135deg, #E0E0E0 0%, #D0D0D0 100%);
-        }
-
-        .movement-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .shoot-button {
-            background: linear-gradient(135deg, #FF6B6B 0%, #E74C3C 100%);
+        .touch-hint {
+            background: rgba(0, 0, 0, 0.8);
             color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid #8B4513;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.3;
         }
 
-        .shoot-button:active {
-            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+        /* タッチ操作時の視覚的フィードバック */
+        .touch-feedback {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid #FFFFFF;
+            pointer-events: none;
+            z-index: 25;
+            animation: touchRipple 0.3s ease-out;
+        }
+
+        @keyframes touchRipple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
         }
 
         /* モバイル対応 */
@@ -204,8 +195,8 @@
                 max-height: calc(100vh - 200px);
             }
 
-            .mobile-controls {
-                display: flex;
+            .touch-instructions {
+                display: block;
             }
 
             .desktop-controls {
@@ -247,18 +238,9 @@
         }
 
         @media (max-width: 480px) {
-            .control-button {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-
-            .mobile-controls {
-                gap: 15px;
-            }
-
-            .movement-controls {
-                gap: 8px;
+            .touch-hint {
+                font-size: 12px;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -284,19 +266,18 @@
                 スペースで次へ
             </span>
             <span class="mobile-controls-text" style="display: none;">
-                ボタンで移動・攻撃<br>
+                画面タッチで移動・攻撃<br>
                 ストーリー中は<br>
                 画面タップで次へ
             </span>
         </div>
         
-        <!-- モバイル用コントロール -->
-        <div class="mobile-controls">
-            <div class="movement-controls">
-                <div class="control-button" id="leftBtn">←</div>
-                <div class="control-button" id="rightBtn">→</div>
+        <!-- タッチ操作説明 -->
+        <div class="touch-instructions" style="display: none;">
+            <div class="touch-hint">
+                画面をタッチして移動<br>
+                タップで攻撃
             </div>
-            <div class="control-button shoot-button" id="shootBtn">🔫</div>
         </div>
     </div>
     <!-- GSAP for animations -->
