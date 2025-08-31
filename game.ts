@@ -124,6 +124,10 @@ export class AnimalShootingGame {
         this.currentStoryMessage = this.storyMode.nextMessage();
         if (this.currentStoryMessage) {
             this.storyText.startTyping(this.currentStoryMessage);
+            // モバイルUIをストーリーモード用に調整
+            if (typeof window !== 'undefined' && (window as any).adjustUIForStoryMode) {
+                (window as any).adjustUIForStoryMode(true);
+            }
         }
     }
     
@@ -132,11 +136,19 @@ export class AnimalShootingGame {
             this.currentStoryMessage = this.storyMode.nextMessage();
             if (this.currentStoryMessage) {
                 this.storyText.startTyping(this.currentStoryMessage);
+                // モバイルUIをストーリーモード用に調整
+                if (typeof window !== 'undefined' && (window as any).adjustUIForStoryMode) {
+                    (window as any).adjustUIForStoryMode(true);
+                }
             } else {
                 // ストーリー終了、ゲーム開始
                 this.storyPaused = false;
                 this.storyText.hide();
                 this.textDisplay.addMessage("ゲーム開始！", 200, 100, 2000, 20, '#27AE60');
+                // モバイルUIを通常モードに戻す
+                if (typeof window !== 'undefined' && (window as any).adjustUIForStoryMode) {
+                    (window as any).adjustUIForStoryMode(false);
+                }
             }
         } else {
             // タイピングをスキップしてテキストを全表示
@@ -182,6 +194,10 @@ export class AnimalShootingGame {
                         this.currentStoryMessage = this.storyMode.nextMessage();
                         if (this.currentStoryMessage) {
                             this.storyText.startTyping(this.currentStoryMessage);
+                            // モバイルUIをストーリーモード用に調整
+                            if (typeof window !== 'undefined' && (window as any).adjustUIForStoryMode) {
+                                (window as any).adjustUIForStoryMode(true);
+                            }
                         }
                     }, 3000);
                 } else {
@@ -519,6 +535,11 @@ export class AnimalShootingGame {
         this.stageTarget = 10;
         this.textDisplay = new TextDisplay(this.ctx);
         this.storyText = new StoryText(this.ctx);
+        
+        // モバイルUIを通常モードに戻す
+        if (typeof window !== 'undefined' && (window as any).adjustUIForStoryMode) {
+            (window as any).adjustUIForStoryMode(false);
+        }
         
         // ストーリー再開
         this.startStory();

@@ -364,6 +364,13 @@
                 gap: 8px;
                 z-index: 1000;
                 pointer-events: auto;
+                /* ストーリーテキスト表示時の位置調整 */
+                transition: bottom 0.3s ease;
+            }
+
+            /* ストーリーテキスト表示時のボタン位置調整 */
+            .mobile-controls.story-mode {
+                bottom: 120px; /* ストーリーテキストボックスの高さ分上に移動 */
             }
 
             .touch-instructions {
@@ -373,6 +380,13 @@
                 left: 10px;
                 z-index: 1000;
                 pointer-events: auto;
+                /* ストーリーテキスト表示時の位置調整 */
+                transition: bottom 0.3s ease;
+            }
+
+            /* ストーリーテキスト表示時の説明位置調整 */
+            .touch-instructions.story-mode {
+                bottom: 120px; /* ストーリーテキストボックスの高さ分上に移動 */
             }
 
             .desktop-controls {
@@ -440,9 +454,19 @@
                 right: 5px;
             }
 
+            /* ストーリーテキスト表示時のボタン位置調整（小画面） */
+            .mobile-controls.story-mode {
+                bottom: 100px; /* 小画面では少し小さく */
+            }
+
             .touch-instructions {
                 bottom: 5px;
                 left: 5px;
+            }
+
+            /* ストーリーテキスト表示時の説明位置調整（小画面） */
+            .touch-instructions.story-mode {
+                bottom: 100px; /* 小画面では少し小さく */
             }
 
             .touch-hint {
@@ -598,6 +622,28 @@
             }
         }
         
+        // ストーリーモード時のUI調整
+        function adjustUIForStoryMode(isStoryMode) {
+            const mobileControls = document.querySelector('.mobile-controls');
+            const touchInstructions = document.querySelector('.touch-instructions');
+            
+            if (mobileControls) {
+                if (isStoryMode) {
+                    mobileControls.classList.add('story-mode');
+                } else {
+                    mobileControls.classList.remove('story-mode');
+                }
+            }
+            
+            if (touchInstructions) {
+                if (isStoryMode) {
+                    touchInstructions.classList.add('story-mode');
+                } else {
+                    touchInstructions.classList.remove('story-mode');
+                }
+            }
+        }
+
         // デバイス検出とUI制御
         function detectDeviceAndSetupUI() {
             const userAgent = navigator.userAgent;
@@ -652,6 +698,9 @@
                 detectDeviceAndSetupUI();
             }, 500);
         });
+
+        // グローバル関数として公開（ゲームスクリプトから呼び出し可能）
+        window.adjustUIForStoryMode = adjustUIForStoryMode;
     </script>
 </body>
 </html>
