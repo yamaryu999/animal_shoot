@@ -346,6 +346,7 @@ export class AnimalShootingGame {
         }
     }
     updateUI() {
+        // PC用スコア表示
         const scoreElement = document.getElementById('score');
         const livesElement = document.getElementById('lives');
         if (scoreElement) {
@@ -353,6 +354,16 @@ export class AnimalShootingGame {
         }
         if (livesElement) {
             livesElement.textContent = this.player.getLives().toString();
+        }
+        
+        // モバイル用スコア表示
+        const scoreMobileElement = document.getElementById('scoreMobile');
+        const livesMobileElement = document.getElementById('livesMobile');
+        if (scoreMobileElement) {
+            scoreMobileElement.textContent = this.score.toString();
+        }
+        if (livesMobileElement) {
+            livesMobileElement.textContent = this.player.getLives().toString();
         }
     }
     showGameOver() {
