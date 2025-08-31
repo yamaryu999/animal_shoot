@@ -1057,6 +1057,11 @@ class AnimalShootingGame {
     private stageProgress: number = 0;
     private enemiesDefeated: number = 0;
     private stageTarget: number = 10;
+    
+    // モバイル操作関連
+    private isMobile: boolean = false;
+    private touchControls: { [key: string]: boolean } = {};
+    private mobileButtons: { [key: string]: HTMLElement } = {};
 
     constructor() {
         this.canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -1088,9 +1093,19 @@ class AnimalShootingGame {
         this.storyText = new StoryText(this.ctx);
         this.storyMode = new StoryMode();
         
+        // モバイル検出
+        this.detectMobile();
+        
         this.setupEventListeners();
+        this.setupMobileControls();
         this.startStory();
         this.gameLoop();
+    }
+
+    private detectMobile(): void {
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                       ('ontouchstart' in window) ||
+                       (window.innerWidth <= 768);
     }
 
     private setupEventListeners(): void {
@@ -1106,6 +1121,60 @@ class AnimalShootingGame {
         document.addEventListener('keyup', (e) => {
             this.keys[e.code] = false;
         });
+
+        // タッチイベント（ストーリースキップ用）
+        if (this.isMobile) {
+            this.canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (this.storyPaused) {
+                    this.skipStoryText();
+                }
+            });
+        }
+    }
+
+    private setupMobileControls(): void {
+        if (!this.isMobile) return;
+
+        // モバイルボタンの取得
+        this.mobileButtons.left = document.getElementById('leftBtn')!;
+        this.mobileButtons.right = document.getElementById('rightBtn')!;
+        this.mobileButtons.shoot = document.getElementById('shootBtn')!;
+
+        // 左移動ボタン
+        this.setupMobileButton(this.mobileButtons.left, 'ArrowLeft');
+        
+        // 右移動ボタン
+        this.setupMobileButton(this.mobileButtons.right, 'ArrowRight');
+        
+        // 攻撃ボタン
+        this.setupMobileButton(this.mobileButtons.shoot, 'Space');
+    }
+
+    private setupMobileButton(button: HTMLElement, keyCode: string): void {
+        if (!button) return;
+
+        const startTouch = (e: Event) => {
+            e.preventDefault();
+            this.touchControls[keyCode] = true;
+            button.classList.add('pressed');
+        };
+
+        const endTouch = (e: Event) => {
+            e.preventDefault();
+            this.touchControls[keyCode] = false;
+            button.classList.remove('pressed');
+        };
+
+        // タッチイベント
+        button.addEventListener('touchstart', startTouch);
+        button.addEventListener('touchend', endTouch);
+        button.addEventListener('touchcancel', endTouch);
+        
+        // マウスイベント（デスクトップでのテスト用）
+        button.addEventListener('mousedown', startTouch);
+        button.addEventListener('mouseup', endTouch);
+        button.addEventListener('mouseleave', endTouch);
     }
     
     private startStory(): void {
@@ -1164,13 +1233,18 @@ class AnimalShootingGame {
     }
 
     private handleInput(): void {
-        if (this.keys['ArrowLeft']) {
+        // キーボード入力
+        const leftPressed = this.keys['ArrowLeft'] || this.touchControls['ArrowLeft'];
+        const rightPressed = this.keys['ArrowRight'] || this.touchControls['ArrowRight'];
+        const spacePressed = this.keys['Space'] || this.touchControls['Space'];
+
+        if (leftPressed) {
             this.player.moveLeft();
         }
-        if (this.keys['ArrowRight']) {
+        if (rightPressed) {
             this.player.moveRight();
         }
-        if (this.keys['Space']) {
+        if (spacePressed) {
             this.shoot();
         }
     }
@@ -1464,6 +1538,9 @@ class AnimalShootingGame {
         this.stageTarget = 10;
         this.textDisplay = new TextDisplay(this.ctx);
         this.storyText = new StoryText(this.ctx);
+        
+        // タッチコントロールのリセット
+        this.touchControls = {};
         
         // ストーリー再開
         this.startStory();
