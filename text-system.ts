@@ -124,70 +124,89 @@ export class StoryText {
         const canvasWidth = this.ctx.canvas.width;
         const canvasHeight = this.ctx.canvas.height;
 
-        // テキストボックスのサイズと位置をキャンバスサイズに合わせて調整
-        const boxWidth = Math.min(canvasWidth * 0.8, 300); // 最大300pxまたはキャンバス幅の80%
-        const boxHeight = 100; // 固定
-        const boxX = (canvasWidth - boxWidth) / 2; // 中央に配置
-        const boxY = canvasHeight - boxHeight - 20; // 画面下部に配置
-
-        // テキストボックスの背景
+        // テキストの長さに基づいてボックスサイズを動的に調整
         this.ctx.save();
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-        this.ctx.strokeStyle = '#8B4513';
-        this.ctx.lineWidth = 3;
-        this.ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-        // テキスト
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '14px Comic Sans MS';
+        this.ctx.font = '16px Comic Sans MS';
         this.ctx.textAlign = 'left';
-
-        // 改良された複数行対応
+        
+        // テキストの幅を事前に計算
         const words = this.currentText.split(' ');
-        let line = '';
-        let y = boxY + 20; // テキスト開始位置
-        const maxWidth = boxWidth - 40; // テキストボックス内の最大幅（左右20pxのパディング）
-        const lineHeight = 18;
-        const maxLines = 4; // 最大行数
-        let currentLine = 0;
-
+        const maxWidth = Math.min(canvasWidth * 0.85, 350); // 最大350pxまたはキャンバス幅の85%
+        const padding = 30;
+        const lineHeight = 22;
+        const maxLines = 6; // 最大行数を増加
+        
+        // 行分割の計算
+        const lines: string[] = [];
+        let currentLine = '';
+        
         for (let word of words) {
-            const testLine = line + word + ' ';
+            const testLine = currentLine + word + ' ';
             const testWidth = this.ctx.measureText(testLine).width;
             
-            if (testWidth > maxWidth && line !== '') {
-                // 現在の行を描画
-                if (currentLine < maxLines) {
-                    this.ctx.fillText(line.trim(), boxX + 20, y);
-                    y += lineHeight;
-                    currentLine++;
-                }
-                line = word + ' ';
+            if (testWidth > maxWidth - padding * 2 && currentLine !== '') {
+                lines.push(currentLine.trim());
+                currentLine = word + ' ';
             } else {
-                line = testLine;
-            }
-            
-            // 最大行数に達した場合は省略記号を追加
-            if (currentLine >= maxLines) {
-                if (line.length > 0) {
-                    const truncatedLine = line.substring(0, 30) + '...';
-                    this.ctx.fillText(truncatedLine, boxX + 20, y - lineHeight);
-                }
-                break;
+                currentLine = testLine;
             }
         }
         
-        // 最後の行を描画
-        if (currentLine < maxLines && line.trim().length > 0) {
-            this.ctx.fillText(line.trim(), boxX + 20, y);
+        if (currentLine.trim().length > 0) {
+            lines.push(currentLine.trim());
+        }
+        
+        // 最大行数を超える場合は省略
+        const displayLines = lines.slice(0, maxLines);
+        if (lines.length > maxLines) {
+            displayLines[maxLines - 1] = displayLines[maxLines - 1].substring(0, 40) + '...';
+        }
+        
+        // ボックスサイズを動的に計算
+        const boxWidth = maxWidth;
+        const boxHeight = Math.max(120, displayLines.length * lineHeight + padding * 2);
+        const boxX = (canvasWidth - boxWidth) / 2;
+        const boxY = canvasHeight - boxHeight - 30;
+
+        // テキストボックスの背景（1930年代風のデザイン）
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+        
+        // 枠線（1930年代風の茶色）
+        this.ctx.strokeStyle = '#8B4513';
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+        
+        // 内側の装飾線
+        this.ctx.strokeStyle = '#D2691E';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(boxX + 4, boxY + 4, boxWidth - 8, boxHeight - 8);
+
+        // テキストの描画
+        this.ctx.fillStyle = '#F5F5DC'; // ベージュ色のテキスト
+        this.ctx.font = 'bold 16px Comic Sans MS';
+        this.ctx.textAlign = 'left';
+        
+        let y = boxY + padding + 16; // テキスト開始位置
+        
+        for (let i = 0; i < displayLines.length; i++) {
+            const line = displayLines[i];
+            this.ctx.fillText(line, boxX + padding, y);
+            y += lineHeight;
         }
 
-        // タイピングカーソル
-        if (this.isTyping && currentLine < maxLines) {
-            this.ctx.fillStyle = 'white';
-            const cursorX = boxX + 20 + this.ctx.measureText(line.trim()).width;
-            this.ctx.fillRect(cursorX, y - 15, 2, 15);
+        // タイピングカーソル（点滅効果付き）
+        if (this.isTyping && displayLines.length < maxLines) {
+            const lastLine = displayLines[displayLines.length - 1] || '';
+            const cursorX = boxX + padding + this.ctx.measureText(lastLine).width;
+            const cursorY = y - lineHeight;
+            
+            // 点滅効果
+            const blinkTime = Math.floor(performance.now() / 500) % 2;
+            if (blinkTime === 0) {
+                this.ctx.fillStyle = '#F5F5DC';
+                this.ctx.fillRect(cursorX, cursorY - 15, 3, 18);
+            }
         }
 
         this.ctx.restore();
