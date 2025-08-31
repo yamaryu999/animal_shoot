@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>どうぶつシューティング</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 50%, #D2B48C 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(0,0,0,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 80%, rgba(0,0,0,0.1) 2px, transparent 2px);
+            background-size: 50px 50px, 30px 30px;
+            pointer-events: none;
+        }
+
+        .game-container {
+            position: relative;
+            border: 8px solid #000000;
+            border-radius: 15px;
+            box-shadow: 
+                0 0 0 4px #8B4513,
+                0 20px 40px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            background: #FFFFFF;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 50%, #F4A460 100%);
+            border-radius: 8px;
+            border: 3px solid #000000;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #2c1810;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 
+                2px 2px 0 #fff,
+                4px 4px 0 #8b4513;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 3px solid #8b4513;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #f4a460, #daa520);
+            color: #2c1810;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            border: 5px solid #8b4513;
+            box-shadow: 
+                0 0 0 3px #654321,
+                0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-over h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #ff6b6b, #dc143c);
+            color: white;
+            border: 3px solid #8b4513;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 1px 1px 0 #000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #2c1810;
+            font-size: 14px;
+            text-align: right;
+            text-shadow: 1px 1px 0 #fff;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #8b4513;
+            max-width: 200px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div class="ui-overlay">
+            <div>スコア: <span id="score">0</span></div>
+            <div>ライフ: <span id="lives">3</span></div>
+        </div>
+        <div class="game-over" id="gameOver">
+            <h2>ゲームオーバー</h2>
+            <p>最終スコア: <span id="finalScore">0</span></p>
+            <button class="restart-btn" onclick="restartGame()">もう一度プレイ</button>
+        </div>
+        <div class="instructions">
+            <strong>操作方法</strong><br>
+            ← → で移動<br>
+            スペースで攻撃<br>
+            ストーリー中は<br>
+            スペースで次へ
+        </div>
+    </div>
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Three.js for 3D effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Game script -->
+    <script src="game.js"></script>
+</body>
+</html>
