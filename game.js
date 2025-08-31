@@ -1029,6 +1029,8 @@ class AnimalShootingGame {
         this.touchPosition = null;
         this.lastTouchTime = 0;
         this.touchThreshold = 200; // タップ判定の時間閾値（ミリ秒）
+        this.autoShoot = false; // 自動攻撃モード
+        this.shootButtonPressed = false; // 攻撃ボタンの状態
         
         // モバイル検出
         this.detectMobile();
@@ -1136,6 +1138,65 @@ class AnimalShootingGame {
             e.preventDefault();
             this.touchPosition = null;
         });
+
+        // 攻撃ボタンのイベントリスナー
+        const shootBtn = document.getElementById('shootBtn');
+        if (shootBtn) {
+            shootBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = true;
+                shootBtn.classList.add('pressed');
+            });
+
+            shootBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = false;
+                shootBtn.classList.remove('pressed');
+            });
+
+            shootBtn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = false;
+                shootBtn.classList.remove('pressed');
+            });
+
+            // デスクトップでのテスト用
+            shootBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = true;
+                shootBtn.classList.add('pressed');
+            });
+
+            shootBtn.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = false;
+                shootBtn.classList.remove('pressed');
+            });
+
+            shootBtn.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                this.shootButtonPressed = false;
+                shootBtn.classList.remove('pressed');
+            });
+        }
+
+        // 自動攻撃ボタンのイベントリスナー
+        const autoShootBtn = document.getElementById('autoShootBtn');
+        if (autoShootBtn) {
+            autoShootBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.autoShoot = !this.autoShoot;
+                autoShootBtn.classList.toggle('active');
+                autoShootBtn.textContent = this.autoShoot ? '🔴' : '⚪';
+            });
+
+            autoShootBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                this.autoShoot = !this.autoShoot;
+                autoShootBtn.classList.toggle('active');
+                autoShootBtn.textContent = this.autoShoot ? '🔴' : '⚪';
+            });
+        }
     }
 
     createTouchFeedback(clientX, clientY) {
@@ -1224,6 +1285,16 @@ class AnimalShootingGame {
         // タッチ入力（モバイル）
         if (this.isMobile && this.touchPosition) {
             this.handleTouchMovement();
+        }
+
+        // モバイル攻撃ボタン
+        if (this.isMobile && this.shootButtonPressed) {
+            this.shoot();
+        }
+
+        // 自動攻撃
+        if (this.isMobile && this.autoShoot) {
+            this.shoot();
         }
     }
 
@@ -1541,6 +1612,8 @@ class AnimalShootingGame {
         
         // タッチコントロールのリセット
         this.touchPosition = null;
+        this.shootButtonPressed = false;
+        this.autoShoot = false;
         
         // ストーリー再開
         this.startStory();
